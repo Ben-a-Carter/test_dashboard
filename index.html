@@ -4,80 +4,210 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Interactive Analytics Dashboard</title>
+  <title>Student Analytics Lab</title>
 
   <link rel="stylesheet" href="css/styles.css">
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 
 <body>
 
 <header class="hero">
-  <h1>Interactive Analytics Dashboard</h1>
-  <p>Explore enrollment and retention outcomes</p>
+  <div class="hero-inner">
+    <p class="eyebrow">Applied Analytics Lab</p>
+    <h1>Student Analytics Dashboard</h1>
+    <p class="hero-subtitle">
+      Interactive exploration of simulated enrollment, retention, academic performance,
+      and student risk.
+    </p>
+  </div>
 </header>
 
 <main class="container">
 
-  <section class="filters">
+  <section class="filter-panel">
 
-    <label>
-      Year
+    <div class="filter-group">
+      <label for="yearFilter">Academic year</label>
       <select id="yearFilter">
         <option value="all">All years</option>
       </select>
-    </label>
+    </div>
 
-    <label>
-      Department
+    <div class="filter-group">
+      <label for="departmentFilter">Department</label>
       <select id="departmentFilter">
         <option value="all">All departments</option>
       </select>
-    </label>
+    </div>
+
+    <div class="filter-group">
+      <label for="studentTypeFilter">Student type</label>
+      <select id="studentTypeFilter">
+        <option value="all">All student types</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="riskFilter">Risk level</label>
+      <select id="riskFilter">
+        <option value="all">All risk levels</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button id="resetFilters" type="button">
+        Reset filters
+      </button>
+    </div>
 
   </section>
 
 
   <section class="metrics">
 
-    <div class="metric-card">
-      <div class="metric-label">Enrollment</div>
-      <div id="totalEnrollment" class="metric-value">—</div>
-    </div>
+    <article class="metric-card">
+      <div class="metric-label">Students</div>
+      <div id="studentCount" class="metric-value">—</div>
+    </article>
 
-    <div class="metric-card">
-      <div class="metric-label">Average retention</div>
-      <div id="avgRetention" class="metric-value">—</div>
-    </div>
+    <article class="metric-card">
+      <div class="metric-label">Retention rate</div>
+      <div id="retentionRate" class="metric-value">—</div>
+    </article>
 
-    <div class="metric-card">
-      <div class="metric-label">Students at risk</div>
-      <div id="totalRisk" class="metric-value">—</div>
-    </div>
+    <article class="metric-card">
+      <div class="metric-label">Average GPA</div>
+      <div id="averageGPA" class="metric-value">—</div>
+    </article>
+
+    <article class="metric-card">
+      <div class="metric-label">High-risk students</div>
+      <div id="highRiskRate" class="metric-value">—</div>
+    </article>
 
   </section>
 
 
-  <section class="chart-card">
-    <h2>Enrollment</h2>
+  <section class="dashboard-grid">
 
-    <div class="chart-container">
-      <canvas id="enrollmentChart"></canvas>
-    </div>
+    <article class="chart-card chart-wide">
+      <div class="chart-heading">
+        <div>
+          <h2>Enrollment trend</h2>
+          <p>Student records represented in the current filter selection.</p>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="enrollmentChart"></canvas>
+      </div>
+    </article>
+
+
+    <article class="chart-card">
+      <div class="chart-heading">
+        <div>
+          <h2>Risk distribution</h2>
+          <p>Current students by simulated risk category.</p>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="riskChart"></canvas>
+      </div>
+    </article>
+
+
+    <article class="chart-card chart-wide">
+      <div class="chart-heading">
+        <div>
+          <h2>Students by department and type</h2>
+          <p>Click a department to filter the entire dashboard.</p>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="departmentChart"></canvas>
+      </div>
+    </article>
+
+
+    <article class="chart-card chart-wide">
+      <div class="chart-heading">
+        <div>
+          <h2>GPA vs. completed credits</h2>
+          <p>
+            Hover over observations for student details. Point size reflects advising visits.
+          </p>
+        </div>
+      </div>
+
+      <div id="gpaScatter" class="plotly-chart"></div>
+    </article>
+
+
+    <article class="chart-card chart-full">
+      <div class="chart-heading">
+        <div>
+          <h2>Retention heatmap</h2>
+          <p>Retention rate by department and academic year.</p>
+        </div>
+      </div>
+
+      <div id="retentionHeatmap" class="plotly-chart heatmap-chart"></div>
+    </article>
+
   </section>
 
 
-  <section class="chart-card">
-    <h2>Retention</h2>
+  <section class="table-card">
 
-    <div class="chart-container">
-      <canvas id="retentionChart"></canvas>
+    <div class="table-heading">
+      <div>
+        <h2>Student records</h2>
+        <p>
+          Showing the first 100 records matching the current filters.
+        </p>
+      </div>
+
+      <div id="tableCount" class="table-count"></div>
     </div>
+
+    <div class="table-wrapper">
+
+      <table id="studentTable">
+
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Year</th>
+            <th>Department</th>
+            <th>Type</th>
+            <th>GPA</th>
+            <th>Credits</th>
+            <th>Attendance</th>
+            <th>Risk</th>
+            <th>Retained</th>
+          </tr>
+        </thead>
+
+        <tbody></tbody>
+
+      </table>
+
+    </div>
+
   </section>
 
 </main>
+
+<footer class="footer">
+  Simulated data for demonstration purposes only.
+</footer>
 
 <script src="js/dashboard.js"></script>
 
