@@ -75,11 +75,51 @@ function applyPlots(d,exclude=null){return d.filter(r=>{for(const[source,filters
 function dataFor(source=null){return applyPlots(applyDropdowns(activeData),source);}
 
 function initializeFilterAnchorControl(){
-  const sidebar=document.querySelector('.filters-sidebar'),button=document.getElementById('anchorFiltersToggle'),label=document.getElementById('anchorFiltersLabel');
-  if(!sidebar||!button||!label)return;
-  let anchored=localStorage.getItem('dashboard-filter-sidebar')==='anchored';
-  function applyAnchorState(){sidebar.classList.toggle('filters-anchored',anchored);button.setAttribute('aria-pressed',String(anchored));label.textContent=anchored?'Filters anchored':'Anchor filters';button.title=anchored?'Allow filters to move with the page':'Keep filters visible while scrolling';}
-  button.addEventListener('click',()=>{anchored=!anchored;localStorage.setItem('dashboard-filter-sidebar',anchored?'anchored':'scroll');applyAnchorState();});
+  const sidebar=document.querySelector('.filters-sidebar');
+  const button=document.getElementById('anchorFiltersToggle');
+
+  if(!sidebar||!button)return;
+
+  let followsScroll=
+    localStorage.getItem('dashboard-filter-sidebar')==='anchored';
+
+  function applyAnchorState(){
+    sidebar.classList.toggle(
+      'filters-anchored',
+      followsScroll
+    );
+
+    button.setAttribute(
+      'aria-pressed',
+      String(followsScroll)
+    );
+
+    button.setAttribute(
+      'aria-label',
+      followsScroll
+        ?'Keep filters in their default position'
+        :'Make filters follow scrolling'
+    );
+
+    button.title=
+      followsScroll
+        ?'Filters follow scrolling. Click to keep them in their default position.'
+        :'Filters stay in their default position. Click to make them follow scrolling.';
+  }
+
+  button.addEventListener('click',()=>{
+    followsScroll=!followsScroll;
+
+    localStorage.setItem(
+      'dashboard-filter-sidebar',
+      followsScroll
+        ?'anchored'
+        :'scroll'
+    );
+
+    applyAnchorState();
+  });
+
   applyAnchorState();
 }
 
