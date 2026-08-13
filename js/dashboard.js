@@ -15,11 +15,11 @@ donor:{title:'Donor development and fundraising',description:'Monitor engagement
 quality:{title:'Accreditation and program quality monitoring',description:'Track benchmark performance, evidence strength, compliance status, continuous improvement, and action items.',data:simQuality(),filters:[['year','Review year'],['school','School'],['standard','Standard'],['program_level','Program level'],['compliance_status','Compliance status'],['action_status','Action status']],metrics:[['Measures',d=>d.length.toLocaleString()],['Meets/exceeds',d=>`${(d.filter(r=>r.compliance_status!=='Needs attention').length/Math.max(d.length,1)*100).toFixed(1)}%`],['Avg observed',d=>avg(d,'observed_score',1)],['Avg benchmark gap',d=>avg(d,'gap_to_benchmark',1)]],trend:{x:'year',lineField:'compliance_status',lineValue:'Exceeds',title:'Quality measures and exceedance rate',help:'Click a review year to cross-filter.'},category:{field:'school',stack:'program_level',title:'Measures by school',help:'Click a school to cross-filter.'},status:{field:'compliance_status',title:'Compliance profile',help:'Click a category to cross-filter.'},scatter:{x:'benchmark',y:'observed_score',color:'compliance_status',size:'evidence_score',title:'Observed performance vs. benchmark',help:'Lasso measures to filter other views.'},heatmap:{row:'standard',col:'year',numeric:'gap_to_benchmark',title:'Benchmark gap heatmap',help:'Click a standard-year cell to filter.'},distribution:{category:'school',value:'evidence_score',title:'Evidence strength distribution',help:'Click a school box to cross-filter.'},flow:{first:'standard',second:'compliance_status',third:'action_status',title:'Quality action flow',help:'Click nodes to filter.'}},
 communication:{title:'Strategic communication and transparency',description:'Assess reach, engagement, sentiment, trust, transparency, audience response, and channel effectiveness.',data:simCommunication(),filters:[['year','Year'],['audience','Audience'],['channel','Channel'],['topic','Topic'],['response_tone','Response tone']],metrics:[['Messages',d=>d.length.toLocaleString()],['Total reach',d=>sum(d,'reach').toLocaleString()],['Avg engagement',d=>`${avg(d,'engagement_rate',1)}%`],['Avg trust',d=>avg(d,'trust_score',1)]],trend:{x:'year',valueField:'reach',lineNumeric:'engagement_rate',title:'Reach and engagement trend',help:'Click a year to cross-filter.'},category:{field:'audience',stack:'channel',valueField:'reach',title:'Reach by audience',help:'Click an audience to cross-filter.'},status:{field:'response_tone',title:'Response tone',help:'Click a tone to cross-filter.'},scatter:{x:'engagement_rate',y:'trust_score',color:'response_tone',size:'reach',title:'Engagement vs. trust',help:'Lasso messages to filter other views.'},heatmap:{row:'topic',col:'year',numeric:'transparency_score',title:'Transparency heatmap',help:'Click a topic-year cell to filter.'},distribution:{category:'channel',value:'sentiment_score',title:'Sentiment distribution',help:'Click a channel box to cross-filter.'},flow:{first:'audience',second:'channel',third:'response_tone',title:'Communication response flow',help:'Click nodes to filter.'}}};
 const themeState={mode:'system'};function getTheme(){return document.documentElement.getAttribute('data-theme')||'light'}function resolvedTheme(){if(themeState.mode==='light'||themeState.mode==='dark')return themeState.mode;return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function pTheme(){const d=getTheme()==='dark';return{bg:d?'#1a1e24':'#fff',text:d?'#edf1f5':'#3d3d3a',grid:d?'#30363d':'#e2e0db'}}function themedLayout(l={}){const t=pTheme();return{...l,paper_bgcolor:t.bg,plot_bgcolor:t.bg,font:{color:t.text,...(l.font||{})},xaxis:{gridcolor:t.grid,zerolinecolor:t.grid,...(l.xaxis||{})},yaxis:{gridcolor:t.grid,zerolinecolor:t.grid,...(l.yaxis||{})}}}
-function initTheme(){themeState.mode='system';localStorage.removeItem('analytics-theme-mode');const media=window.matchMedia('(prefers-color-scheme: dark)');const apply=()=>{document.documentElement.setAttribute('data-theme',resolvedTheme());updateThemeButton();if(activeData.length)renderDashboard()};document.getElementById('themeToggle').addEventListener('click',()=>{themeState.mode=themeState.mode==='system'?'light':themeState.mode==='light'?'dark':'light';apply()});media.addEventListener('change',()=>{if(themeState.mode==='system')apply()});apply()}function updateThemeButton(){const b=document.getElementById('themeToggle'),i=document.getElementById('themeIcon'),l=document.getElementById('themeLabel');if(themeState.mode==='system'){i.textContent='◐';l.textContent='System'}else if(themeState.mode==='light'){i.textContent='☀';l.textContent='Light'}else{i.textContent='☾';l.textContent='Dark'}b.setAttribute('aria-label',`Change appearance. Current setting: ${l.textContent}`);b.title=themeState.mode==='system'?'Appearance: System. Click to switch to Light.':`Appearance: ${l.textContent}. Click to switch to ${themeState.mode==='light'?'Dark':'Light'}.`}
+function initTheme(){themeState.mode='system';localStorage.removeItem('analytics-theme-mode');const media=window.matchMedia('(prefers-color-scheme: dark)');const apply=()=>{document.documentElement.setAttribute('data-theme',resolvedTheme());updateThemeButton();if(activeData.length)renderDashboard()};document.getElementById('themeToggle').addEventListener('click',()=>{themeState.mode=themeState.mode==='system'?'light':themeState.mode==='light'?'dark':'light';apply()});media.addEventListener('change',()=>{if(themeState.mode==='system')apply()});apply()}function updateThemeButton(){const b=document.getElementById('themeToggle'),i=document.getElementById('themeIcon'),l=document.getElementById('themeLabel');if(themeState.mode==='system'){i.textContent='◐';l.textContent='System'}else if(themeState.mode==='light'){i.textContent='☀︎';l.textContent='Light'}else{i.textContent='☾';l.textContent='Dark'}b.setAttribute('aria-label',`Change appearance. Current setting: ${l.textContent}`);b.title=themeState.mode==='system'?'System. Click to switch to Light.':`${l.textContent}. Click to switch to ${themeState.mode==='light'?'Dark':'Light'}.`}
 function resetState(){Object.keys(dropdownState).forEach(k=>delete dropdownState[k]);['trend','category','status','scatter','heatmap','distribution','flow'].forEach(k=>plotFilters[k]={});tableState.sortField='id';tableState.sortDirection='asc'}function applyDropdowns(d){return d.filter(r=>Object.entries(dropdownState).every(([f,v])=>v==='all'||String(r[f])===String(v)))}function applyPlots(d,exclude=null){return d.filter(r=>{for(const[source,filters]of Object.entries(plotFilters)){if(source===exclude)continue;for(const[f,v]of Object.entries(filters)){if(f==='ids'){if(!v.includes(r.id))return false}else if(String(r[f])!==String(v))return false}}return true})}function dataFor(source=null){return applyPlots(applyDropdowns(activeData),source)}
 function switchTab(key){activeTab=key;activeData=configs[key].data;resetState();buildUI();renderDashboard();document.querySelectorAll('.tab-button').forEach(b=>b.classList.toggle('active',b.dataset.tab===key))}
 function buildUI(){const c=configs[activeTab];document.getElementById('filterTitle').textContent=c.title;document.getElementById('dashboardKicker').textContent=c.title;document.getElementById('dashboardTitle').textContent=c.title;document.getElementById('dashboardDescription').textContent=c.description;const fc=document.getElementById('filterControls');fc.innerHTML='';c.filters.forEach(([f,label])=>{dropdownState[f]='all';const g=document.createElement('div');g.className='filter-group';const l=document.createElement('label');l.htmlFor=`filter-${f}`;l.textContent=label;const s=document.createElement('select');s.id=`filter-${f}`;const a=document.createElement('option');a.value='all';a.textContent=`All ${label.toLowerCase()}`;s.appendChild(a);uniq(activeData,f).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)});s.addEventListener('change',e=>{dropdownState[f]=e.target.value;renderDashboard()});g.append(l,s);fc.appendChild(g)});[['trend','trendTitle','trendHelp'],['category','categoryTitle','categoryHelp'],['status','statusTitle','statusHelp'],['scatter','scatterTitle','scatterHelp'],['heatmap','heatmapTitle','heatmapHelp'],['distribution','distributionTitle','distributionHelp'],['flow','flowTitle','flowHelp']].forEach(([k,t,h])=>{document.getElementById(t).textContent=c[k].title;document.getElementById(h).textContent=c[k].help});document.getElementById('tableTitle').textContent=`${c.title} records`}
-function renderDashboard(){filteredData=dataFor();renderMetrics();renderActive();renderResets();renderTrend();renderCategory();renderStatus();renderScatter();renderHeatmap();renderDistribution();renderFlow();renderTable()}
+function renderDashboard(){filteredData=dataFor();renderMetrics();renderActive();renderResets();updatePlotFilterLabels();renderTrend();renderCategory();renderStatus();renderScatter();renderHeatmap();renderDistribution();renderFlow();renderTable()}
 function renderMetrics(){const m=document.getElementById('metrics');m.innerHTML='';configs[activeTab].metrics.forEach(([l,fn])=>{const c=document.createElement('article');c.className='metric-card';c.innerHTML=`<div class="metric-label">${l}</div><div class="metric-value">${fn(filteredData)}</div>`;m.appendChild(c)})}function renderActive(){const c=document.getElementById('activeFilters');c.innerHTML='';let n=0;const chip=t=>{const s=document.createElement('span');s.className='filter-chip';s.textContent=t;c.appendChild(s);n++};Object.entries(dropdownState).forEach(([f,v])=>{if(v!=='all')chip(`${f}: ${v}`)});Object.entries(plotFilters).forEach(([src,fs])=>Object.entries(fs).forEach(([f,v])=>chip(`${src}: ${f==='ids'?`${v.length} selected`:v}`)));if(!n){const s=document.createElement('span');s.className='no-filter';s.textContent='No filters applied';c.appendChild(s)}}
 function formatPlotFilterValue(
   field,
@@ -40,19 +40,109 @@ function formatPlotFilterValue(
 }
 
 
-function getPlotFilterLabel(
-  source
-) {
-
-  const filters =
-    plotFilters[source] ||
-    {};
-
+function getEffectiveFilterEntries() {
 
   const entries =
-    Object.entries(
-      filters
-    );
+    [];
+
+
+  /*
+    Dashboard dropdown filters affect every visualization,
+    so include all active dropdown selections.
+  */
+
+  Object.entries(
+    dropdownState
+  )
+  .forEach(
+    (
+      [
+        field,
+        value
+      ]
+    ) => {
+
+      if (
+        value !== "all"
+      ) {
+
+        entries.push({
+
+          source:
+            "Dashboard",
+
+          field,
+
+          value
+
+        });
+
+      }
+
+    }
+  );
+
+
+  /*
+    Chart actions also affect the coordinated dashboard.
+
+    We intentionally include every active chart action in the
+    label shown beside every plot. This gives users a consistent
+    view of the current dashboard context regardless of which
+    visualization originally created the filter.
+  */
+
+  Object.entries(
+    plotFilters
+  )
+  .forEach(
+    (
+      [
+        source,
+        filters
+      ]
+    ) => {
+
+      Object.entries(
+        filters
+      )
+      .forEach(
+        (
+          [
+            field,
+            value
+          ]
+        ) => {
+
+          entries.push({
+
+            source:
+              prettify(
+                source
+              ),
+
+            field,
+
+            value
+
+          });
+
+        }
+      );
+
+    }
+  );
+
+
+  return entries;
+
+}
+
+
+function getGlobalPlotFilterLabel() {
+
+  const entries =
+    getEffectiveFilterEntries();
 
 
   if (
@@ -60,50 +150,74 @@ function getPlotFilterLabel(
     0
   ) {
 
-    return "No chart filter";
+    return "No active filters";
 
   }
 
+
+  const formatted =
+    entries.map(
+      entry => {
+
+        if (
+          entry.field ===
+          "ids"
+        ) {
+
+          return `${entry.value.length.toLocaleString()} selected records`;
+
+        }
+
+
+        return `${prettify(
+          entry.field
+        )}: ${entry.value}`;
+
+      }
+    );
+
+
+  /*
+    Keep the label readable when many filters are active.
+    Show the first two filters and summarize any remainder.
+  */
 
   if (
-    entries.length ===
-    1
+    formatted.length <=
+    2
   ) {
 
-    const [
-      field,
-      value
-    ] =
-      entries[0];
-
-
-    return `Filtered by ${formatPlotFilterValue(
-      field,
-      value
-    )}`;
+    return `Filtered by ${formatted.join(" + ")}`;
 
   }
 
 
-  return `Filtered by ${entries
-    .map(
-      (
-        [
-          field,
-          value
-        ]
-      ) =>
-        formatPlotFilterValue(
-          field,
-          value
-        )
-    )
-    .join(" + ")}`;
+  return (
+
+    `Filtered by ${formatted
+      .slice(
+        0,
+        2
+      )
+      .join(" + ")}` +
+
+    ` + ${formatted.length - 2} more`
+
+  );
 
 }
 
 
 function updatePlotFilterLabels() {
+
+  const text =
+    getGlobalPlotFilterLabel();
+
+
+  const active =
+    text !==
+    "No active filters";
+
 
   document
     .querySelectorAll(
@@ -112,66 +226,64 @@ function updatePlotFilterLabels() {
     .forEach(
       label => {
 
-        const source =
-          label.dataset.filterLabel;
-
-
-        const text =
-          getPlotFilterLabel(
-            source
-          );
-
-
         label.textContent =
           text;
 
 
         label.classList.toggle(
           "active",
-          text !==
-          "No chart filter"
+          active
         );
+
+
+        label.title =
+          active
+
+            ? getEffectiveFilterEntries()
+                .map(
+                  entry =>
+
+                    entry.field ===
+                    "ids"
+
+                      ? `${entry.source}: ${entry.value.length.toLocaleString()} selected records`
+
+                      : `${entry.source}: ${prettify(entry.field)} = ${entry.value}`
+
+                )
+                .join(" | ")
+
+            : "No active filters";
 
       }
     );
 
 
-  const legacyMap = {
+  /*
+    Backward-compatible support for the earlier element IDs.
+  */
 
-    trend:
-      "trendFilterLabel",
+  const legacyIds = [
 
-    department:
-      "departmentFilterLabel",
+    "trendFilterLabel",
 
-    risk:
-      "riskFilterLabel",
+    "departmentFilterLabel",
 
-    scatter:
-      "scatterFilterLabel",
+    "riskFilterLabel",
 
-    heatmap:
-      "heatmapFilterLabel",
+    "scatterFilterLabel",
 
-    box:
-      "boxFilterLabel",
+    "heatmapFilterLabel",
 
-    sankey:
-      "sankeyFilterLabel"
+    "boxFilterLabel",
 
-  };
+    "sankeyFilterLabel"
+
+  ];
 
 
-  Object.entries(
-    legacyMap
-  )
-  .forEach(
-    (
-      [
-        source,
-        elementId
-      ]
-    ) => {
+  legacyIds.forEach(
+    elementId => {
 
       const label =
         document.getElementById(
@@ -188,20 +300,13 @@ function updatePlotFilterLabels() {
       }
 
 
-      const text =
-        getPlotFilterLabel(
-          source
-        );
-
-
       label.textContent =
         text;
 
 
       label.classList.toggle(
         "active",
-        text !==
-        "No chart filter"
+        active
       );
 
     }
