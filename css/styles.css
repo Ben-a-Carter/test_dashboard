@@ -1596,7 +1596,6 @@
   display: none;
   align-items: center;
   gap: 6px;
-
   min-height: 31px;
   padding: 7px 10px;
 
@@ -1622,7 +1621,6 @@
 .anchor-filters-toggle[aria-pressed="true"] {
   background: var(--blue-light);
   color: var(--navy);
-  border-color: var(--border-strong);
 }
 
 .anchor-filter-icon {
@@ -1630,14 +1628,13 @@
   align-items: center;
   justify-content: center;
   width: 1em;
-  font-size: 14px;
   line-height: 1;
 }
 
 /*
-  Override the original wide-screen sticky rule.
-
-  Scroll-with-page is now the default.
+  Wide screens:
+  - default = scroll with page
+  - anchored = sticky
 */
 @media (min-width: 1180px) {
 
@@ -1648,15 +1645,10 @@
   .filters-sidebar {
     position: static !important;
     top: auto !important;
-    align-self: start;
     max-height: none !important;
     overflow: visible !important;
   }
 
-  /*
-    Sticky positioning is enabled only after the user
-    explicitly activates Anchor filters.
-  */
   .filters-sidebar.filters-anchored {
     position: sticky !important;
     top: 18px !important;
@@ -1671,15 +1663,6 @@
 
   .anchor-filters-toggle {
     display: none !important;
-  }
-
-}
-
-@media (max-width: 700px) {
-
-  .filter-heading-actions {
-    width: 100%;
-    justify-content: flex-start;
   }
 
 }
