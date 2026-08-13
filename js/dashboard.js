@@ -3,87 +3,78 @@
    ========================================================= */
 
 let originalData = [];
+
 let filteredData = [];
 
 
 /* =========================================================
-   DROPDOWN FILTER STATE
+   DROPDOWN FILTERS
    ========================================================= */
 
 const dashboardState = {
 
-  year: "all",
+  year:
+    "all",
 
-  term: "all",
+  term:
+    "all",
 
-  department: "all",
+  department:
+    "all",
 
-  program: "all",
+  program:
+    "all",
 
-  studentType: "all",
+  studentType:
+    "all",
 
-  risk: "all"
+  risk:
+    "all"
 
 };
 
 
 /* =========================================================
-   PLOT FILTER STATE
-   =========================================================
-
-   Each visualization owns its own filter.
-
-   Important:
-   When a plot redraws itself, its OWN filter is excluded.
-
-   Example:
-   Clicking "Public Health" in the department plot:
-
-       plotFilters.department = {
-         department: "Public Health"
-       }
-
-   All OTHER plots get filtered to Public Health.
-
-   The department plot itself still displays every department,
-   with Public Health highlighted.
-
+   PLOT FILTERS
    ========================================================= */
 
 const plotFilters = {
 
-  trend: {},
+  trend:
+    {},
 
-  department: {},
+  department:
+    {},
 
-  risk: {},
+  risk:
+    {},
 
-  scatter: {},
+  scatter:
+    {},
 
-  heatmap: {},
+  heatmap:
+    {},
 
-  box: {},
+  box:
+    {},
 
-  sankey: {}
+  sankey:
+    {}
 
 };
 
 
 /* =========================================================
    HOVER STATE
-   =========================================================
-
-   Hover never filters data.
-
-   It only highlights related marks temporarily.
-
    ========================================================= */
 
 const hoverState = {
 
-  filters: {},
+  filters:
+    {},
 
-  message: null
+  message:
+    null
 
 };
 
@@ -99,6 +90,21 @@ const tableState = {
 
   sortDirection:
     "asc"
+
+};
+
+
+/* =========================================================
+   THEME STATE
+   ========================================================= */
+
+const themeState = {
+
+  mode:
+    localStorage.getItem(
+      "dashboard-theme"
+    ) ||
+    "system"
 
 };
 
@@ -134,7 +140,7 @@ const colors = {
 
 
 /* =========================================================
-   PLOTLY CONFIG
+   PLOT CONFIG
    ========================================================= */
 
 const plotConfig = {
@@ -164,7 +170,10 @@ const columns = [
 
   ["program", "Program"],
 
-  ["student_type", "Student type"],
+  [
+    "student_type",
+    "Student type"
+  ],
 
   ["gender", "Gender"],
 
@@ -355,6 +364,8 @@ Papa.parse(
 
 function initializeDashboard() {
 
+  initializeTheme();
+
   populateFilters();
 
   buildTableHeader();
@@ -369,89 +380,336 @@ function initializeDashboard() {
 
 
 /* =========================================================
-   POPULATE FILTERS
+   THEME
    ========================================================= */
 
-function populateFilters() {
+function initializeTheme() {
 
-  populateSelect(
+  const selector =
+    document.getElementById(
+      "themeSelect"
+    );
 
-    "yearFilter",
 
-    uniqueValues(
-      originalData,
-      "year"
+  selector.value =
+    themeState.mode;
+
+
+  selector.addEventListener(
+
+    "change",
+
+    event => {
+
+      themeState.mode =
+        event.target.value;
+
+
+      localStorage.setItem(
+        "dashboard-theme",
+        themeState.mode
+      );
+
+
+      applyTheme();
+
+    }
+
+  );
+
+
+  const systemTheme =
+    window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+
+
+  systemTheme.addEventListener(
+
+    "change",
+
+    () => {
+
+      if (
+        themeState.mode ===
+        "system"
+      ) {
+
+        applyTheme();
+
+      }
+
+    }
+
+  );
+
+
+  applyTheme();
+
+}
+
+
+function getResolvedTheme() {
+
+  if (
+    themeState.mode ===
+    "light"
+  ) {
+
+    return "light";
+
+  }
+
+
+  if (
+    themeState.mode ===
+    "dark"
+  ) {
+
+    return "dark";
+
+  }
+
+
+  return window
+    .matchMedia(
+      "(prefers-color-scheme: dark)"
     )
+    .matches
 
-  );
+      ? "dark"
 
+      : "light";
 
-  populateSelect(
-
-    "termFilter",
-
-    uniqueValues(
-      originalData,
-      "term"
-    )
-
-  );
+}
 
 
-  populateSelect(
+function applyTheme() {
 
-    "departmentFilter",
-
-    uniqueValues(
-      originalData,
-      "department"
-    )
-
-  );
+  const theme =
+    getResolvedTheme();
 
 
-  populateSelect(
-
-    "programFilter",
-
-    uniqueValues(
-      originalData,
-      "program"
-    )
-
-  );
+  document
+    .documentElement
+    .setAttribute(
+      "data-theme",
+      theme
+    );
 
 
-  populateSelect(
+  if (
+    originalData.length > 0
+  ) {
 
-    "studentTypeFilter",
+    updateDashboard();
 
-    uniqueValues(
-      originalData,
-      "student_type"
-    )
-
-  );
-
-
-  populateSelect(
-
-    "riskFilter",
-
-    [
-      "Low",
-      "Medium",
-      "High"
-    ]
-
-  );
+  }
 
 }
 
 
 /* =========================================================
-   GENERIC SELECT POPULATOR
+   PLOT THEME
    ========================================================= */
+
+function getPlotTheme() {
+
+  const dark =
+    getResolvedTheme() ===
+    "dark";
+
+
+  return {
+
+    background:
+
+      dark
+        ? "#1a1e24"
+        : "#ffffff",
+
+    text:
+
+      dark
+        ? "#edf1f5"
+        : "#3d3d3a",
+
+    muted:
+
+      dark
+        ? "#aab4bf"
+        : "#73726c",
+
+    grid:
+
+      dark
+        ? "#30363d"
+        : "#e2e0db",
+
+    zero:
+
+      dark
+        ? "#414851"
+        : "#cac7c1"
+
+  };
+
+}
+
+
+function themedLayout(
+  layout = {}
+) {
+
+  const theme =
+    getPlotTheme();
+
+
+  const existingXAxis =
+    layout.xaxis ||
+    {};
+
+
+  const existingYAxis =
+    layout.yaxis ||
+    {};
+
+
+  return {
+
+    ...layout,
+
+
+    paper_bgcolor:
+      theme.background,
+
+
+    plot_bgcolor:
+      theme.background,
+
+
+    font: {
+
+      color:
+        theme.text,
+
+      ...layout.font
+
+    },
+
+
+    xaxis: {
+
+      gridcolor:
+        theme.grid,
+
+      zerolinecolor:
+        theme.zero,
+
+      tickfont: {
+        color:
+          theme.text
+      },
+
+      titlefont: {
+        color:
+          theme.text
+      },
+
+      ...existingXAxis
+
+    },
+
+
+    yaxis: {
+
+      gridcolor:
+        theme.grid,
+
+      zerolinecolor:
+        theme.zero,
+
+      tickfont: {
+        color:
+          theme.text
+      },
+
+      titlefont: {
+        color:
+          theme.text
+      },
+
+      ...existingYAxis
+
+    }
+
+  };
+
+}
+
+
+/* =========================================================
+   FILTER POPULATION
+   ========================================================= */
+
+function populateFilters() {
+
+  populateSelect(
+    "yearFilter",
+    uniqueValues(
+      originalData,
+      "year"
+    )
+  );
+
+
+  populateSelect(
+    "termFilter",
+    uniqueValues(
+      originalData,
+      "term"
+    )
+  );
+
+
+  populateSelect(
+    "departmentFilter",
+    uniqueValues(
+      originalData,
+      "department"
+    )
+  );
+
+
+  populateSelect(
+    "programFilter",
+    uniqueValues(
+      originalData,
+      "program"
+    )
+  );
+
+
+  populateSelect(
+    "studentTypeFilter",
+    uniqueValues(
+      originalData,
+      "student_type"
+    )
+  );
+
+
+  populateSelect(
+    "riskFilter",
+    [
+      "Low",
+      "Medium",
+      "High"
+    ]
+  );
+
+}
+
 
 function populateSelect(
   elementId,
@@ -491,10 +749,6 @@ function populateSelect(
 }
 
 
-/* =========================================================
-   UNIQUE VALUES
-   ========================================================= */
-
 function uniqueValues(
   data,
   field
@@ -520,35 +774,39 @@ function uniqueValues(
 
     )
 
-  ].sort(
-    (
-      a,
-      b
-    ) => {
+  ]
+    .sort(
+      (
+        a,
+        b
+      ) => {
 
-      if (
-        typeof a === "number" &&
-        typeof b === "number"
-      ) {
+        if (
+          typeof a ===
+            "number" &&
 
-        return a - b;
+          typeof b ===
+            "number"
+        ) {
+
+          return a - b;
+
+        }
+
+
+        return String(a)
+          .localeCompare(
+            String(b)
+          );
 
       }
-
-
-      return String(a)
-        .localeCompare(
-          String(b)
-        );
-
-    }
-  );
+    );
 
 }
 
 
 /* =========================================================
-   DROPDOWN EVENTS
+   FILTER EVENTS
    ========================================================= */
 
 function connectFilterEvents() {
@@ -632,125 +890,66 @@ function connectFilterEvents() {
 
 
 /* =========================================================
-   PER-PLOT RESET BUTTONS
+   PLOT RESET EVENTS
    ========================================================= */
 
 function connectResetButtons() {
 
-  document
-    .getElementById(
-      "trendReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
+  const resetMap = {
 
-        plotFilters.trend =
-          {};
+    trendReset:
+      "trend",
 
-        updateDashboard();
+    departmentReset:
+      "department",
 
-      }
-    );
+    riskReset:
+      "risk",
 
+    scatterReset:
+      "scatter",
 
-  document
-    .getElementById(
-      "departmentReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
+    heatmapReset:
+      "heatmap",
 
-        plotFilters.department =
-          {};
+    boxReset:
+      "box",
 
-        updateDashboard();
+    sankeyReset:
+      "sankey"
 
-      }
-    );
+  };
 
 
-  document
-    .getElementById(
-      "riskReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
+  Object.entries(
+    resetMap
+  )
+    .forEach(
+      (
+        [
+          buttonId,
+          source
+        ]
+      ) => {
 
-        plotFilters.risk =
-          {};
+        document
+          .getElementById(
+            buttonId
+          )
+          .addEventListener(
+            "click",
+            () => {
 
-        updateDashboard();
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "scatterReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
-
-        plotFilters.scatter =
-          {};
-
-        updateDashboard();
-
-      }
-    );
+              plotFilters[
+                source
+              ] =
+                {};
 
 
-  document
-    .getElementById(
-      "heatmapReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
+              updateDashboard();
 
-        plotFilters.heatmap =
-          {};
-
-        updateDashboard();
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "boxReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
-
-        plotFilters.box =
-          {};
-
-        updateDashboard();
-
-      }
-    );
-
-
-  document
-    .getElementById(
-      "sankeyReset"
-    )
-    .addEventListener(
-      "click",
-      () => {
-
-        plotFilters.sankey =
-          {};
-
-        updateDashboard();
+            }
+          );
 
       }
     );
@@ -764,23 +963,33 @@ function connectResetButtons() {
 
 function resetAll() {
 
-  dashboardState.year =
-    "all";
+  Object.assign(
 
-  dashboardState.term =
-    "all";
+    dashboardState,
 
-  dashboardState.department =
-    "all";
+    {
 
-  dashboardState.program =
-    "all";
+      year:
+        "all",
 
-  dashboardState.studentType =
-    "all";
+      term:
+        "all",
 
-  dashboardState.risk =
-    "all";
+      department:
+        "all",
+
+      program:
+        "all",
+
+      studentType:
+        "all",
+
+      risk:
+        "all"
+
+    }
+
+  );
 
 
   Object.keys(
@@ -855,7 +1064,7 @@ function resetAll() {
 
 
 /* =========================================================
-   DROPDOWN FILTERING
+   APPLY DROPDOWN FILTERS
    ========================================================= */
 
 function applyDropdownFilters(
@@ -954,18 +1163,7 @@ function applyDropdownFilters(
 
 
 /* =========================================================
-   APPLY CROSS-FILTERS
-   =========================================================
-
-   excludeSource is the key Tableau-style behavior.
-
-   If the department plot is rendering, we exclude its
-   own department filter.
-
-   That allows all department bars to remain visible.
-
-   Every OTHER visualization sees the department filter.
-
+   APPLY PLOT FILTERS
    ========================================================= */
 
 function applyPlotFilters(
@@ -999,17 +1197,12 @@ function applyPlotFilters(
         for (
           const [
             field,
-            expectedValue
+            expected
           ]
           of Object.entries(
             filters
           )
         ) {
-
-          /*
-            Scatter selection stores
-            an array of student IDs.
-          */
 
           if (
             field ===
@@ -1017,7 +1210,7 @@ function applyPlotFilters(
           ) {
 
             if (
-              !expectedValue.includes(
+              !expected.includes(
                 row.student_id
               )
             ) {
@@ -1037,7 +1230,7 @@ function applyPlotFilters(
               row[field]
             ) !==
             String(
-              expectedValue
+              expected
             )
           ) {
 
@@ -1059,7 +1252,7 @@ function applyPlotFilters(
 
 
 /* =========================================================
-   GET DATA FOR SPECIFIC VIEW
+   GET DATA FOR VIEW
    ========================================================= */
 
 function getDataForView(
@@ -1081,7 +1274,7 @@ function getDataForView(
 
 
 /* =========================================================
-   MAIN DASHBOARD UPDATE
+   DASHBOARD UPDATE
    ========================================================= */
 
 function updateDashboard() {
@@ -1116,7 +1309,7 @@ function updateDashboard() {
 
 
 /* =========================================================
-   ACTIVE FILTER LABELS
+   ACTIVE FILTER DISPLAY
    ========================================================= */
 
 function updateActiveFilters() {
@@ -1131,7 +1324,11 @@ function updateActiveFilters() {
     "";
 
 
-  const dropdownFilters = [
+  let count =
+    0;
+
+
+  const dropdowns = [
 
     [
       "Year",
@@ -1166,10 +1363,7 @@ function updateActiveFilters() {
   ];
 
 
-  let count = 0;
-
-
-  dropdownFilters.forEach(
+  dropdowns.forEach(
     (
       [
         label,
@@ -1178,7 +1372,8 @@ function updateActiveFilters() {
     ) => {
 
       if (
-        value !== "all"
+        value !==
+        "all"
       ) {
 
         addFilterChip(
@@ -1187,7 +1382,8 @@ function updateActiveFilters() {
         );
 
 
-        count += 1;
+        count +=
+          1;
 
       }
 
@@ -1217,8 +1413,8 @@ function updateActiveFilters() {
               ]
             ) => {
 
-              let label =
-                `${source}: ${field} = ${value}`;
+              let displayValue =
+                value;
 
 
               if (
@@ -1226,19 +1422,23 @@ function updateActiveFilters() {
                 "student_ids"
               ) {
 
-                label =
-                  `${source}: ${value.length} students`;
+                displayValue =
+                  `${value.length} students`;
 
               }
 
 
               addFilterChip(
+
                 container,
-                label
+
+                `${source}: ${displayValue}`
+
               );
 
 
-              count += 1;
+              count +=
+                1;
 
             }
           );
@@ -1248,7 +1448,8 @@ function updateActiveFilters() {
 
 
   if (
-    count === 0
+    count ===
+    0
   ) {
 
     const text =
@@ -1306,74 +1507,59 @@ function addFilterChip(
 
 function updateResetButtons() {
 
-  document
-    .getElementById(
-      "trendReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.trend
-      ).length === 0;
+  const map = {
+
+    trendReset:
+      "trend",
+
+    departmentReset:
+      "department",
+
+    riskReset:
+      "risk",
+
+    scatterReset:
+      "scatter",
+
+    heatmapReset:
+      "heatmap",
+
+    boxReset:
+      "box",
+
+    sankeyReset:
+      "sankey"
+
+  };
 
 
-  document
-    .getElementById(
-      "departmentReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.department
-      ).length === 0;
+  Object.entries(
+    map
+  )
+    .forEach(
+      (
+        [
+          buttonId,
+          source
+        ]
+      ) => {
 
+        document
+          .getElementById(
+            buttonId
+          )
+          .disabled =
 
-  document
-    .getElementById(
-      "riskReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.risk
-      ).length === 0;
+            Object.keys(
+              plotFilters[
+                source
+              ]
+            )
+              .length ===
+            0;
 
-
-  document
-    .getElementById(
-      "scatterReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.scatter
-      ).length === 0;
-
-
-  document
-    .getElementById(
-      "heatmapReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.heatmap
-      ).length === 0;
-
-
-  document
-    .getElementById(
-      "boxReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.box
-      ).length === 0;
-
-
-  document
-    .getElementById(
-      "sankeyReset"
-    )
-    .disabled =
-      Object.keys(
-        plotFilters.sankey
-      ).length === 0;
+      }
+    );
 
 }
 
@@ -1417,18 +1603,22 @@ function updateMetrics() {
 
 
   const avgGPA =
-    count > 0
+
+    count
 
       ? data.reduce(
           (
-            total,
+            sum,
             row
           ) =>
-            total +
+
+            sum +
             Number(
               row.gpa
             ),
+
           0
+
         ) /
         count
 
@@ -1512,7 +1702,7 @@ function updateMetrics() {
 
 
 /* =========================================================
-   TREND CHART
+   TREND
    ========================================================= */
 
 function updateTrendChart() {
@@ -1537,68 +1727,56 @@ function updateTrendChart() {
 
 
   const counts =
-    [];
+    years.map(
+      year =>
 
-
-  const retention =
-    [];
-
-
-  years.forEach(
-    year => {
-
-      const subset =
         data.filter(
           row =>
             row.year ===
             year
-        );
-
-
-      counts.push(
-        subset.length
-      );
-
-
-      const retained =
-        subset.filter(
-          row =>
-            row.retained ===
-            "Yes"
-        ).length;
-
-
-      retention.push(
-
-        subset.length
-
-          ? retained /
-            subset.length *
-            100
-
-          : 0
-
-      );
-
-    }
-  );
-
-
-  const barColors =
-    years.map(
-      year =>
-
-        selectedYear ===
-          undefined ||
-
-        String(year) ===
-          String(selectedYear)
-
-          ? colors.blue
-
-          : "#c9d5df"
+        ).length
 
     );
+
+
+  const retention =
+    years.map(
+      year => {
+
+        const subset =
+          data.filter(
+            row =>
+              row.year ===
+              year
+          );
+
+
+        const retained =
+          subset.filter(
+            row =>
+              row.retained ===
+              "Yes"
+          ).length;
+
+
+        return (
+
+          subset.length
+
+            ? retained /
+              subset.length *
+              100
+
+            : 0
+
+        );
+
+      }
+    );
+
+
+  const theme =
+    getPlotTheme();
 
 
   Plotly.react(
@@ -1622,13 +1800,33 @@ function updateTrendChart() {
           "Students",
 
         marker: {
+
           color:
-            barColors
+            years.map(
+              year =>
+
+                selectedYear ===
+                  undefined ||
+
+                String(year) ===
+                  String(
+                    selectedYear
+                  )
+
+                  ? colors.blue
+
+                  : theme.grid
+
+            )
+
         },
 
         hovertemplate:
+
           "Year %{x}" +
+
           "<br>Students: %{y:,}" +
+
           "<extra></extra>"
 
       },
@@ -1670,21 +1868,33 @@ function updateTrendChart() {
         },
 
         hovertemplate:
+
           "Year %{x}" +
+
           "<br>Retention: %{y:.1f}%" +
+
           "<extra></extra>"
 
       }
 
     ],
 
-    {
+    themedLayout({
 
       margin: {
-        t: 15,
-        r: 60,
-        b: 55,
-        l: 60
+
+        t:
+          15,
+
+        r:
+          65,
+
+        b:
+          55,
+
+        l:
+          60
+
       },
 
       xaxis: {
@@ -1712,7 +1922,20 @@ function updateTrendChart() {
           "%",
 
         range:
-          [0,100]
+          [0,100],
+
+        tickfont: {
+          color:
+            theme.text
+        },
+
+        titlefont: {
+          color:
+            theme.text
+        },
+
+        gridcolor:
+          theme.grid
 
       },
 
@@ -1724,108 +1947,113 @@ function updateTrendChart() {
         y:
           1.12
 
-      },
+      }
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)",
-
-      plot_bgcolor:
-        "rgba(0,0,0,0)"
-
-    },
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "trendChart"
+        const plot =
+          document.getElementById(
+            "trendChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_click",
+
+          eventData => {
+
+            const year =
+              eventData
+                .points?.[0]
+                ?.x;
 
 
-      plot.on(
-        "plotly_click",
-        eventData => {
+            if (
+              year ===
+              undefined
+            ) {
 
-          const year =
-            eventData
-              .points?.[0]
-              ?.x;
+              return;
 
-
-          if (
-            year ===
-            undefined
-          ) {
-
-            return;
-
-          }
+            }
 
 
-          plotFilters.trend =
-            {
-              year:
-                year
-            };
-
-
-          updateDashboard();
-
-        }
-      );
-
-
-      plot.on(
-        "plotly_hover",
-        eventData => {
-
-          const year =
-            eventData
-              .points?.[0]
-              ?.x;
-
-
-          if (
-            year !==
-            undefined
-          ) {
-
-            setHover(
+            plotFilters.trend =
               {
+
                 year:
                   year
-              },
-              `Highlighting ${year}`
-            );
+
+              };
+
+
+            updateDashboard();
 
           }
 
-        }
-      );
+        );
 
 
-      plot.on(
-        "plotly_unhover",
-        clearHover
-      );
+        plot.on(
 
-    }
-  );
+          "plotly_hover",
+
+          eventData => {
+
+            const year =
+              eventData
+                .points?.[0]
+                ?.x;
+
+
+            if (
+              year !==
+              undefined
+            ) {
+
+              setHover(
+
+                {
+                  year:
+                    year
+                },
+
+                `Highlighting ${year}`
+
+              );
+
+            }
+
+          }
+
+        );
+
+
+        plot.on(
+          "plotly_unhover",
+          clearHover
+        );
+
+      }
+    );
 
 }
 
 
 /* =========================================================
-   DEPARTMENT CHART
+   DEPARTMENT
    ========================================================= */
 
 function updateDepartmentChart() {
@@ -1927,8 +2155,11 @@ function updateDepartmentChart() {
         },
 
         hovertemplate:
+
           "%{x}" +
+
           `<br>${type}: %{y:,}` +
+
           "<extra></extra>"
 
       })
@@ -1941,16 +2172,25 @@ function updateDepartmentChart() {
 
     traces,
 
-    {
+    themedLayout({
 
       barmode:
         "stack",
 
       margin: {
-        t: 15,
-        r: 15,
-        b: 95,
-        l: 55
+
+        t:
+          15,
+
+        r:
+          15,
+
+        b:
+          95,
+
+        l:
+          55
+
       },
 
       xaxis: {
@@ -1964,106 +2204,112 @@ function updateDepartmentChart() {
       },
 
       legend: {
+
         orientation:
           "h",
+
         y:
           1.13
-      },
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)",
+      }
 
-      plot_bgcolor:
-        "rgba(0,0,0,0)"
-
-    },
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "departmentChart"
+        const plot =
+          document.getElementById(
+            "departmentChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_click",
+
+          eventData => {
+
+            const department =
+              eventData
+                .points?.[0]
+                ?.x;
 
 
-      plot.on(
-        "plotly_click",
-        eventData => {
+            if (
+              !department
+            ) {
 
-          const department =
-            eventData
-              .points?.[0]
-              ?.x;
+              return;
 
-
-          if (
-            !department
-          ) {
-
-            return;
-
-          }
+            }
 
 
-          plotFilters.department =
-            {
-
-              department:
-                department
-
-            };
-
-
-          updateDashboard();
-
-        }
-      );
-
-
-      plot.on(
-        "plotly_hover",
-        eventData => {
-
-          const department =
-            eventData
-              .points?.[0]
-              ?.x;
-
-
-          if (
-            department
-          ) {
-
-            setHover(
+            plotFilters.department =
               {
+
                 department:
                   department
-              },
-              `Highlighting ${department}`
-            );
+
+              };
+
+
+            updateDashboard();
 
           }
 
-        }
-      );
+        );
 
 
-      plot.on(
-        "plotly_unhover",
-        clearHover
-      );
+        plot.on(
 
-    }
-  );
+          "plotly_hover",
+
+          eventData => {
+
+            const department =
+              eventData
+                .points?.[0]
+                ?.x;
+
+
+            if (
+              department
+            ) {
+
+              setHover(
+
+                {
+                  department:
+                    department
+                },
+
+                `Highlighting ${department}`
+
+              );
+
+            }
+
+          }
+
+        );
+
+
+        plot.on(
+          "plotly_unhover",
+          clearHover
+        );
+
+      }
+    );
 
 }
 
@@ -2161,128 +2407,150 @@ function updateRiskChart() {
           "percent",
 
         hovertemplate:
+
           "%{label}" +
+
           "<br>Students: %{value:,}" +
+
           "<br>%{percent}" +
+
           "<extra></extra>"
 
       }
 
     ],
 
-    {
+    themedLayout({
 
       margin: {
-        t: 20,
-        r: 20,
-        b: 30,
-        l: 20
+
+        t:
+          20,
+
+        r:
+          20,
+
+        b:
+          30,
+
+        l:
+          20
+
       },
 
       legend: {
+
         orientation:
           "h",
+
         y:
           -0.1
-      },
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)"
+      }
 
-    },
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "riskChart"
+        const plot =
+          document.getElementById(
+            "riskChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_click",
+
+          eventData => {
+
+            const risk =
+              eventData
+                .points?.[0]
+                ?.label;
 
 
-      plot.on(
-        "plotly_click",
-        eventData => {
+            if (
+              !risk
+            ) {
 
-          const risk =
-            eventData
-              .points?.[0]
-              ?.label;
+              return;
 
-
-          if (
-            !risk
-          ) {
-
-            return;
-
-          }
+            }
 
 
-          plotFilters.risk =
-            {
-
-              risk_level:
-                risk
-
-            };
-
-
-          updateDashboard();
-
-        }
-      );
-
-
-      plot.on(
-        "plotly_hover",
-        eventData => {
-
-          const risk =
-            eventData
-              .points?.[0]
-              ?.label;
-
-
-          if (
-            risk
-          ) {
-
-            setHover(
+            plotFilters.risk =
               {
+
                 risk_level:
                   risk
-              },
-              `Highlighting ${risk} risk`
-            );
+
+              };
+
+
+            updateDashboard();
 
           }
 
-        }
-      );
+        );
 
 
-      plot.on(
-        "plotly_unhover",
-        clearHover
-      );
+        plot.on(
 
-    }
-  );
+          "plotly_hover",
+
+          eventData => {
+
+            const risk =
+              eventData
+                .points?.[0]
+                ?.label;
+
+
+            if (
+              risk
+            ) {
+
+              setHover(
+
+                {
+                  risk_level:
+                    risk
+                },
+
+                `Highlighting ${risk} risk`
+
+              );
+
+            }
+
+          }
+
+        );
+
+
+        plot.on(
+          "plotly_unhover",
+          clearHover
+        );
+
+      }
+    );
 
 }
 
 
 /* =========================================================
-   SCATTERPLOT
+   SCATTER
    ========================================================= */
 
 function updateScatterChart() {
@@ -2440,16 +2708,25 @@ function updateScatterChart() {
 
     ],
 
-    {
+    themedLayout({
 
       dragmode:
         "lasso",
 
       margin: {
-        t: 15,
-        r: 30,
-        b: 60,
-        l: 60
+
+        t:
+          15,
+
+        r:
+          30,
+
+        b:
+          60,
+
+        l:
+          60
+
       },
 
       xaxis: {
@@ -2483,113 +2760,116 @@ function updateScatterChart() {
         y:
           1.12
 
-      },
+      }
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)",
-
-      plot_bgcolor:
-        "rgba(0,0,0,0)"
-
-    },
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "scatterChart"
+        const plot =
+          document.getElementById(
+            "scatterChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_selected",
+
+          eventData => {
+
+            if (
+              !eventData ||
+              !eventData.points ||
+              eventData.points.length ===
+                0
+            ) {
+
+              return;
+
+            }
 
 
-      plot.on(
-        "plotly_selected",
-        eventData => {
+            const ids =
+              eventData.points
 
-          if (
-            !eventData ||
-            !eventData.points ||
-            eventData.points.length ===
-              0
-          ) {
+                .map(
+                  point =>
+                    point
+                      .customdata?.[0]
+                )
 
-            return;
+                .filter(
+                  Boolean
+                );
+
+
+            plotFilters.scatter =
+              {
+
+                student_ids:
+                  ids
+
+              };
+
+
+            updateDashboard();
 
           }
 
+        );
 
-          const ids =
-            eventData.points
 
-              .map(
-                point =>
-                  point
-                    .customdata?.[0]
-              )
+        plot.on(
 
-              .filter(
-                Boolean
+          "plotly_hover",
+
+          eventData => {
+
+            const id =
+              eventData
+                .points?.[0]
+                ?.customdata?.[0];
+
+
+            if (
+              id
+            ) {
+
+              setHover(
+
+                {
+                  student_id:
+                    id
+                },
+
+                `Highlighting ${id}`
+
               );
 
-
-          plotFilters.scatter =
-            {
-
-              student_ids:
-                ids
-
-            };
-
-
-          updateDashboard();
-
-        }
-      );
-
-
-      plot.on(
-        "plotly_hover",
-        eventData => {
-
-          const id =
-            eventData
-              .points?.[0]
-              ?.customdata?.[0];
-
-
-          if (
-            id
-          ) {
-
-            setHover(
-              {
-                student_id:
-                  id
-              },
-              `Highlighting ${id}`
-            );
+            }
 
           }
 
-        }
-      );
+        );
 
 
-      plot.on(
-        "plotly_unhover",
-        clearHover
-      );
+        plot.on(
+          "plotly_unhover",
+          clearHover
+        );
 
-    }
-  );
+      }
+    );
 
 }
 
@@ -2718,8 +2998,10 @@ function updateHeatmapChart() {
         ],
 
         colorbar: {
+
           title:
             "Retention %"
+
         },
 
         hovertemplate:
@@ -2736,125 +3018,137 @@ function updateHeatmapChart() {
 
     ],
 
-    {
+    themedLayout({
 
       margin: {
-        t: 20,
-        r: 90,
-        b: 55,
-        l: 150
+
+        t:
+          20,
+
+        r:
+          90,
+
+        b:
+          55,
+
+        l:
+          150
+
       },
 
       xaxis: {
+
         title:
           "Academic year"
-      },
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)",
+      }
 
-      plot_bgcolor:
-        "rgba(0,0,0,0)"
-
-    },
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "heatmapChart"
+        const plot =
+          document.getElementById(
+            "heatmapChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_click",
+
+          eventData => {
+
+            const point =
+              eventData
+                .points?.[0];
 
 
-      plot.on(
-        "plotly_click",
-        eventData => {
+            if (
+              !point
+            ) {
 
-          const point =
-            eventData
-              .points?.[0];
+              return;
 
-
-          if (
-            !point
-          ) {
-
-            return;
-
-          }
+            }
 
 
-          plotFilters.heatmap =
-            {
+            plotFilters.heatmap =
+              {
 
-              department:
-                point.y,
+                department:
+                  point.y,
 
-              year:
-                point.x
+                year:
+                  point.x
 
-            };
-
-
-          updateDashboard();
-
-        }
-      );
+              };
 
 
-      plot.on(
-        "plotly_hover",
-        eventData => {
-
-          const point =
-            eventData
-              .points?.[0];
-
-
-          if (
-            !point
-          ) {
-
-            return;
+            updateDashboard();
 
           }
 
-
-          setHover(
-            {
-
-              department:
-                point.y,
-
-              year:
-                point.x
-
-            },
-
-            `Highlighting ${point.y}, ${point.x}`
-
-          );
-
-        }
-      );
+        );
 
 
-      plot.on(
-        "plotly_unhover",
-        clearHover
-      );
+        plot.on(
 
-    }
-  );
+          "plotly_hover",
+
+          eventData => {
+
+            const point =
+              eventData
+                .points?.[0];
+
+
+            if (
+              !point
+            ) {
+
+              return;
+
+            }
+
+
+            setHover(
+
+              {
+
+                department:
+                  point.y,
+
+                year:
+                  point.x
+
+              },
+
+              `Highlighting ${point.y}, ${point.x}`
+
+            );
+
+          }
+
+        );
+
+
+        plot.on(
+          "plotly_unhover",
+          clearHover
+        );
+
+      }
+    );
 
 }
 
@@ -2934,7 +3228,7 @@ function updateBoxChart() {
             "outliers",
 
           jitter:
-            0.3,
+            .3,
 
           marker: {
 
@@ -2956,7 +3250,7 @@ function updateBoxChart() {
 
               ? 1
 
-              : 0.25
+              : .25
 
         };
 
@@ -2970,13 +3264,22 @@ function updateBoxChart() {
 
     traces,
 
-    {
+    themedLayout({
 
       margin: {
-        t: 20,
-        r: 20,
-        b: 100,
-        l: 55
+
+        t:
+          20,
+
+        r:
+          20,
+
+        b:
+          100,
+
+        l:
+          55
+
       },
 
       yaxis: {
@@ -2985,114 +3288,119 @@ function updateBoxChart() {
           "GPA",
 
         range:
-          [0.75,4.05]
+          [.75,4.05]
 
       },
 
       xaxis: {
+
         tickangle:
           -25
+
       },
 
       showlegend:
-        false,
+        false
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)",
-
-      plot_bgcolor:
-        "rgba(0,0,0,0)"
-
-    },
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "boxChart"
+        const plot =
+          document.getElementById(
+            "boxChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_click",
+
+          eventData => {
+
+            const department =
+              eventData
+                .points?.[0]
+                ?.data
+                ?.name;
 
 
-      plot.on(
-        "plotly_click",
-        eventData => {
+            if (
+              !department
+            ) {
 
-          const department =
-            eventData
-              .points?.[0]
-              ?.data
-              ?.name;
+              return;
+
+            }
 
 
-          if (
-            !department
-          ) {
-
-            return;
-
-          }
-
-
-          plotFilters.box =
-            {
-
-              department:
-                department
-
-            };
-
-
-          updateDashboard();
-
-        }
-      );
-
-
-      plot.on(
-        "plotly_hover",
-        eventData => {
-
-          const department =
-            eventData
-              .points?.[0]
-              ?.data
-              ?.name;
-
-
-          if (
-            department
-          ) {
-
-            setHover(
+            plotFilters.box =
               {
+
                 department:
                   department
-              },
-              `Highlighting ${department}`
-            );
+
+              };
+
+
+            updateDashboard();
 
           }
 
-        }
-      );
+        );
 
 
-      plot.on(
-        "plotly_unhover",
-        clearHover
-      );
+        plot.on(
 
-    }
-  );
+          "plotly_hover",
+
+          eventData => {
+
+            const department =
+              eventData
+                .points?.[0]
+                ?.data
+                ?.name;
+
+
+            if (
+              department
+            ) {
+
+              setHover(
+
+                {
+                  department:
+                    department
+                },
+
+                `Highlighting ${department}`
+
+              );
+
+            }
+
+          }
+
+        );
+
+
+        plot.on(
+          "plotly_unhover",
+          clearHover
+        );
+
+      }
+    );
 
 }
 
@@ -3131,8 +3439,10 @@ function updateSankeyChart() {
   const sources =
     [];
 
+
   const targets =
     [];
+
 
   const values =
     [];
@@ -3253,6 +3563,10 @@ function updateSankeyChart() {
   );
 
 
+  const theme =
+    getPlotTheme();
+
+
   Plotly.react(
 
     "sankeyChart",
@@ -3289,7 +3603,7 @@ function updateSankeyChart() {
 
             colors.navy,
 
-            "#a5a5a5"
+            theme.grid
 
           ]
 
@@ -3312,117 +3626,130 @@ function updateSankeyChart() {
 
     ],
 
-    {
+    themedLayout({
 
       margin: {
-        t: 20,
-        r: 20,
-        b: 20,
-        l: 20
-      },
 
-      paper_bgcolor:
-        "rgba(0,0,0,0)"
+        t:
+          20,
 
-    },
+        r:
+          20,
+
+        b:
+          20,
+
+        l:
+          20
+
+      }
+
+    }),
 
     plotConfig
 
   )
-  .then(
-    () => {
+    .then(
+      () => {
 
-      const plot =
-        document.getElementById(
-          "sankeyChart"
+        const plot =
+          document.getElementById(
+            "sankeyChart"
+          );
+
+
+        resetPlotListeners(
+          plot
         );
 
 
-      resetPlotListeners(
-        plot
-      );
+        plot.on(
+
+          "plotly_click",
+
+          eventData => {
+
+            const label =
+              eventData
+                .points?.[0]
+                ?.label;
 
 
-      plot.on(
-        "plotly_click",
-        eventData => {
+            if (
+              label ===
+              "Retained"
+            ) {
 
-          const label =
-            eventData
-              .points?.[0]
-              ?.label;
+              plotFilters.sankey =
+                {
+
+                  retained:
+                    "Yes"
+
+                };
+
+            }
+
+            else if (
+              label ===
+              "Not retained"
+            ) {
+
+              plotFilters.sankey =
+                {
+
+                  retained:
+                    "No"
+
+                };
+
+            }
+
+            else if (
+              label ===
+              "Graduated"
+            ) {
+
+              plotFilters.sankey =
+                {
+
+                  graduated:
+                    "Yes"
+
+                };
+
+            }
+
+            else if (
+              label ===
+              "Not graduated"
+            ) {
+
+              plotFilters.sankey =
+                {
+
+                  graduated:
+                    "No"
+
+                };
+
+            }
+
+            else {
+
+              return;
+
+            }
 
 
-          if (
-            label ===
-            "Retained"
-          ) {
-
-            plotFilters.sankey =
-              {
-                retained:
-                  "Yes"
-              };
+            updateDashboard();
 
           }
 
+        );
 
-          else if (
-            label ===
-            "Not retained"
-          ) {
-
-            plotFilters.sankey =
-              {
-                retained:
-                  "No"
-              };
-
-          }
-
-
-          else if (
-            label ===
-            "Graduated"
-          ) {
-
-            plotFilters.sankey =
-              {
-                graduated:
-                  "Yes"
-              };
-
-          }
-
-
-          else if (
-            label ===
-            "Not graduated"
-          ) {
-
-            plotFilters.sankey =
-              {
-                graduated:
-                  "No"
-              };
-
-          }
-
-
-          else {
-
-            return;
-
-          }
-
-
-          updateDashboard();
-
-        }
-      );
-
-    }
-  );
+      }
+    );
 
 }
 
@@ -3483,7 +3810,9 @@ function buildTableHeader() {
 
 
       button.addEventListener(
+
         "click",
+
         () => {
 
           if (
@@ -3517,6 +3846,7 @@ function buildTableHeader() {
           updateStudentTable();
 
         }
+
       );
 
 
@@ -3560,6 +3890,7 @@ function updateStudentTable() {
           a,
           b
         ) =>
+
           compareValues(
 
             a[
@@ -3583,7 +3914,7 @@ function updateStudentTable() {
     );
 
 
-  const numericRanges =
+  const ranges =
     getNumericRanges(
       filteredData
     );
@@ -3599,6 +3930,30 @@ function updateStudentTable() {
         document.createElement(
           "tr"
         );
+
+
+      tr.dataset.studentId =
+        row.student_id;
+
+
+      tr.dataset.year =
+        row.year;
+
+
+      tr.dataset.department =
+        row.department;
+
+
+      tr.dataset.riskLevel =
+        row.risk_level;
+
+
+      tr.dataset.retained =
+        row.retained;
+
+
+      tr.dataset.graduated =
+        row.graduated;
 
 
       columns.forEach(
@@ -3640,7 +3995,7 @@ function updateStudentTable() {
 
                 Number(value),
 
-                numericRanges[
+                ranges[
                   field
                 ]
 
@@ -3689,7 +4044,7 @@ function updateStudentTable() {
 
       `${rows.length.toLocaleString()}` +
 
-      ` shown of ` +
+      " shown of " +
 
       `${filteredData.length.toLocaleString()}`;
 
@@ -3697,7 +4052,7 @@ function updateStudentTable() {
 
 
 /* =========================================================
-   TABLE SORTING
+   TABLE SORT
    ========================================================= */
 
 function updateSortIndicators() {
@@ -3751,6 +4106,7 @@ function compareValues(
 ) {
 
   const factor =
+
     direction ===
       "asc"
 
@@ -3759,27 +4115,29 @@ function compareValues(
       : -1;
 
 
-  const aNum =
+  const aNumber =
     Number(a);
 
 
-  const bNum =
+  const bNumber =
     Number(b);
 
 
   if (
     Number.isFinite(
-      aNum
+      aNumber
     ) &&
 
     Number.isFinite(
-      bNum
+      bNumber
     )
   ) {
 
     return (
-      aNum -
-      bNum
+
+      aNumber -
+      bNumber
+
     ) *
     factor;
 
@@ -3800,7 +4158,7 @@ function compareValues(
 
 
 /* =========================================================
-   NUMERIC COLOR SCALE
+   NUMERIC TABLE COLORS
    ========================================================= */
 
 function getNumericRanges(
@@ -3830,6 +4188,7 @@ function getNumericRanges(
 
 
       ranges[field] =
+
         values.length
 
           ? {
@@ -3871,6 +4230,7 @@ function numericColor(
 ) {
 
   const span =
+
     range.max -
     range.min ||
     1;
@@ -3896,13 +4256,10 @@ function numericColor(
     );
 
 
-  /*
-    Low values:
-    pale blue
+  const dark =
+    getResolvedTheme() ===
+    "dark";
 
-    High values:
-    pale green
-  */
 
   const hue =
     210 -
@@ -3910,7 +4267,36 @@ function numericColor(
     105;
 
 
+  if (
+    dark
+  ) {
+
+    const lightness =
+
+      18 +
+      proportion *
+      7;
+
+
+    return (
+
+      `hsl(` +
+
+      `${hue} ` +
+
+      `38% ` +
+
+      `${lightness}%` +
+
+      `)`
+
+    );
+
+  }
+
+
   const lightness =
+
     96 -
     proportion *
     14;
@@ -3973,7 +4359,6 @@ function formatCell(
 
 
   if (
-
     field ===
       "attendance_rate" ||
 
@@ -3982,7 +4367,6 @@ function formatCell(
 
     field ===
       "engagement_score"
-
   ) {
 
     return Number(
@@ -3995,13 +4379,11 @@ function formatCell(
 
 
   if (
-
     field ===
       "retention_probability" ||
 
     field ===
       "graduation_probability"
-
   ) {
 
     return `${(
@@ -4039,7 +4421,7 @@ function formatCell(
 
 
 /* =========================================================
-   HOVER HIGHLIGHTING
+   HOVER
    ========================================================= */
 
 function setHover(
@@ -4098,9 +4480,9 @@ function clearHover() {
 
     status.textContent =
 
-      "Hover over a mark to cross-highlight related students. " +
+      "Hover over a mark to highlight related students. " +
 
-      "Click marks to filter other views.";
+      "Click categorical marks to filter the other visualizations.";
 
   }
 
@@ -4111,7 +4493,7 @@ function clearHover() {
 
 
 /* =========================================================
-   TABLE HOVER HIGHLIGHT
+   HIGHLIGHT TABLE ROWS
    ========================================================= */
 
 function highlightTable() {
@@ -4122,9 +4504,13 @@ function highlightTable() {
     );
 
 
+  const filters =
+    hoverState.filters;
+
+
   if (
     Object.keys(
-      hoverState.filters
+      filters
     ).length ===
     0
   ) {
@@ -4145,65 +4531,73 @@ function highlightTable() {
 
 
   rows.forEach(
-    (
-      row,
-      rowIndex
-    ) => {
+    row => {
 
-      const student =
-        filteredData[
-          rowIndex
-        ];
+      const rowValues = {
 
+        student_id:
+          row.dataset.studentId,
 
-      if (
-        !student
-      ) {
+        year:
+          row.dataset.year,
 
-        return;
+        department:
+          row.dataset.department,
 
-      }
+        risk_level:
+          row.dataset.riskLevel,
+
+        retained:
+          row.dataset.retained,
+
+        graduated:
+          row.dataset.graduated
+
+      };
 
 
       let matches =
         true;
 
 
-      for (
-        const [
-          field,
-          expected
-        ]
-        of Object.entries(
-          hoverState.filters
-        )
-      ) {
+      Object.entries(
+        filters
+      )
+        .forEach(
+          (
+            [
+              field,
+              expected
+            ]
+          ) => {
 
-        if (
-          String(
-            student[field]
-          ) !==
-          String(
-            expected
-          )
-        ) {
+            if (
+              String(
+                rowValues[
+                  field
+                ]
+              ) !==
+              String(
+                expected
+              )
+            ) {
 
-          matches =
-            false;
+              matches =
+                false;
 
-          break;
+            }
 
-        }
-
-      }
+          }
+        );
 
 
       row.style.opacity =
+
         matches
 
           ? "1"
 
-          : "0.25";
+          : ".22";
 
     }
   );
@@ -4212,7 +4606,7 @@ function highlightTable() {
 
 
 /* =========================================================
-   PLOT EVENT CLEANUP
+   REMOVE OLD PLOTLY EVENT HANDLERS
    ========================================================= */
 
 function resetPlotListeners(
