@@ -66,3 +66,11 @@
     max-width: 100%;
   }
 }
+
+
+/* Compact paired chart-action controls */
+.plot-actions{display:inline-flex;align-items:stretch;justify-content:flex-end;gap:4px;flex-wrap:nowrap}
+.plot-filter-label{display:inline-flex;align-items:center;min-height:31px;max-width:320px;padding:7px 10px;background:var(--panel-secondary);color:var(--text-secondary);border:1px solid var(--border-strong);border-radius:8px;font-size:12px;font-weight:600;line-height:1.2;white-space:normal}
+.plot-filter-label.active{background:var(--panel-secondary);color:var(--text-primary);border-color:var(--border-strong);font-weight:650}
+.plot-actions .plot-reset{min-height:31px;margin:0}
+@media(max-width:700px){.plot-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.plot-filter-label{max-width:100%}}
