@@ -1499,3 +1499,82 @@
     bottom: 22px;
   }
 }
+
+
+/* =========================================================
+   DIAGONAL MULTI-FILTER STACK INDICATOR
+   ========================================================= */
+
+/*
+  The newest filter remains the main visible card.
+  When more filters are active, the second-most-recent card
+  peeks diagonally upward and to the right.
+*/
+
+.plot-filter-stack {
+  overflow:
+    visible;
+}
+
+.plot-filter-stack-top {
+  position:
+    relative;
+
+  z-index:
+    6;
+}
+
+.plot-filter-stack-second {
+  top:
+    -7px !important;
+
+  left:
+    14px !important;
+
+  right:
+    -14px !important;
+
+  transform:
+    none !important;
+
+  z-index:
+    5 !important;
+
+  opacity:
+    .72;
+
+  pointer-events:
+    none;
+}
+
+/*
+  Expanded menu still opens downward from the main card.
+*/
+
+.plot-filter-stack-menu {
+  top:
+    calc(
+      100% +
+      7px
+    ) !important;
+}
+
+
+/* =========================================================
+   FILTERABLE MARK HOVER CUE
+   ========================================================= */
+
+/*
+  Native Plotly hover handling applies the actual mark outline.
+  This cursor cue reinforces that hovered marks can be clicked.
+*/
+
+.plotly-chart {
+  cursor:
+    crosshair;
+}
+
+.plotly-chart .hoverlayer {
+  pointer-events:
+    none;
+}
