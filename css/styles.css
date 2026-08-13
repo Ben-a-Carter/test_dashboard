@@ -154,3 +154,80 @@
     max-width: 100%;
   }
 }
+
+
+/* =========================================================
+   FILTER CHIPS SHOWN ON EACH PLOT
+   ========================================================= */
+
+.plot-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 62%;
+}
+
+.plot-filter-chip {
+  display: inline-flex;
+  align-items: stretch;
+  min-height: 30px;
+  overflow: hidden;
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.plot-filter-chip-text {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px 6px 10px;
+  white-space: nowrap;
+}
+
+.plot-filter-chip-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 0;
+  border-left: 1px solid var(--border-strong);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.plot-filter-chip-close:hover {
+  background: var(--panel-hover);
+  color: var(--text-primary);
+}
+
+.plot-filter-empty {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .plot-actions {
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+
+  .plot-filter-chip-text {
+    white-space: normal;
+  }
+}
