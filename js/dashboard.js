@@ -89,6 +89,7 @@ function switchTab(key){
 }
 function buildUI(){
   const c=configs[activeTab];
+  document.getElementById('filterTitle').textContent=c.title;
   document.getElementById('dashboardKicker').textContent=c.title;
   document.getElementById('dashboardTitle').textContent=c.title;
   document.getElementById('dashboardDescription').textContent=c.description;
