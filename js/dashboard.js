@@ -25,43 +25,29 @@ function initializeFilterAnchorControl() {
       ".filters-sidebar"
     );
 
-
   const button =
     document.getElementById(
       "anchorFiltersToggle"
     );
-
 
   const label =
     document.getElementById(
       "anchorFiltersLabel"
     );
 
-
   if (
     !sidebar ||
     !button ||
     !label
   ) {
-
     return;
-
   }
-
-
-  /*
-    Default behavior is normal page scrolling.
-
-    Only an explicit saved "anchored" preference enables
-    sticky sidebar behavior.
-  */
 
   let anchored =
     localStorage.getItem(
       "dashboard-filter-sidebar"
     ) ===
     "anchored";
-
 
   function applyAnchorState() {
 
@@ -70,41 +56,25 @@ function initializeFilterAnchorControl() {
       anchored
     );
 
-
     button.setAttribute(
       "aria-pressed",
-      String(
-        anchored
-      )
+      String(anchored)
     );
 
-
-    if (
-      anchored
-    ) {
-
+    if (anchored) {
       label.textContent =
         "Filters anchored";
 
-
       button.title =
         "Allow filters to move with the page";
-
-    }
-
-    else {
-
+    } else {
       label.textContent =
         "Anchor filters";
 
-
       button.title =
         "Keep filters visible while scrolling";
-
     }
-
   }
-
 
   button.addEventListener(
     "click",
@@ -113,28 +83,19 @@ function initializeFilterAnchorControl() {
       anchored =
         !anchored;
 
-
       localStorage.setItem(
-
         "dashboard-filter-sidebar",
-
         anchored
           ? "anchored"
           : "scroll"
-
       );
 
-
       applyAnchorState();
-
     }
   );
 
-
   applyAnchorState();
-
 }
-
 
 document.querySelectorAll('.tab-button').forEach(b=>b.classList.toggle('active',b.dataset.tab===key))}
 function buildUI(){const c=configs[activeTab];document.getElementById('filterTitle').textContent=c.title;document.getElementById('dashboardKicker').textContent=c.title;document.getElementById('dashboardTitle').textContent=c.title;document.getElementById('dashboardDescription').textContent=c.description;const fc=document.getElementById('filterControls');fc.innerHTML='';c.filters.forEach(([f,label])=>{dropdownState[f]='all';const g=document.createElement('div');g.className='filter-group';const l=document.createElement('label');l.htmlFor=`filter-${f}`;l.textContent=label;const s=document.createElement('select');s.id=`filter-${f}`;const a=document.createElement('option');a.value='all';a.textContent=`All ${label.toLowerCase()}`;s.appendChild(a);uniq(activeData,f).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)});s.addEventListener('change',e=>{dropdownState[f]=e.target.value;if(e.target.value==='all')removeFilterFromRecency('dropdown',f);else markFilterAsMostRecent('dropdown',f);renderDashboard()});g.append(l,s);fc.appendChild(g)});[['trend','trendTitle','trendHelp'],['category','categoryTitle','categoryHelp'],['status','statusTitle','statusHelp'],['scatter','scatterTitle','scatterHelp'],['heatmap','heatmapTitle','heatmapHelp'],['distribution','distributionTitle','distributionHelp'],['flow','flowTitle','flowHelp']].forEach(([k,t,h])=>{document.getElementById(t).textContent=c[k].title;document.getElementById(h).textContent=c[k].help});document.getElementById('tableTitle').textContent=`${c.title} records`}
