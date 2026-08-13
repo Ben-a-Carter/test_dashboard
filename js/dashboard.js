@@ -1,11 +1,23 @@
 let originalData = [];
+let filteredData = [];
 
 let enrollmentChart = null;
-let retentionChart = null;
+let riskChart = null;
+let departmentChart = null;
+
+
+const colors = {
+  navy: "#1f3864",
+  blue: "#2e75b6",
+  green: "#548235",
+  orange: "#d98c31",
+  red: "#c94c4c",
+  lightBlue: "#dce8f4"
+};
 
 
 Papa.parse(
-  "data/enrollment.csv",
+  "data/students.csv",
   {
     download: true,
     header: true,
@@ -14,13 +26,25 @@ Papa.parse(
 
     complete: function(results) {
 
-      originalData = results.data;
+      originalData =
+        results.data.filter(
+          row => row.student_id
+        );
 
       populateFilters();
 
       createCharts();
 
       updateDashboard();
+
+    },
+
+    error: function(error) {
+
+      console.error(
+        "Unable to load students.csv:",
+        error
+      );
 
     }
   }
@@ -29,90 +53,248 @@ Papa.parse(
 
 function populateFilters() {
 
-  const years = [
-    ...new Set(
-      originalData.map(row => row.year)
-    )
-  ].sort();
+  populateSelect(
+    "yearFilter",
+    uniqueValues("year")
+  );
 
 
-  const departments = [
-    ...new Set(
-      originalData.map(row => row.department)
-    )
-  ].sort();
+  populateSelect(
+    "departmentFilter",
+    uniqueValues("department")
+  );
 
 
-  const yearFilter =
-    document.getElementById("yearFilter");
+  populateSelect(
+    "studentTypeFilter",
+    uniqueValues("student_type")
+  );
 
 
-  const departmentFilter =
-    document.getElementById("departmentFilter");
+  populateSelect(
+    "riskFilter",
+    ["Low", "Medium", "High"]
+  );
 
 
-  years.forEach(year => {
+  [
+    "yearFilter",
+    "departmentFilter",
+    "studentTypeFilter",
+    "riskFilter"
+  ].forEach(id => {
 
-    const option =
-      document.createElement("option");
-
-    option.value = year;
-    option.textContent = year;
-
-    yearFilter.appendChild(option);
+    document
+      .getElementById(id)
+      .addEventListener(
+        "change",
+        updateDashboard
+      );
 
   });
 
 
-  departments.forEach(department => {
+  document
+    .getElementById("resetFilters")
+    .addEventListener(
+      "click",
+      resetFilters
+    );
+
+}
+
+
+function uniqueValues(field) {
+
+  return [
+    ...new Set(
+      originalData
+        .map(row => row[field])
+        .filter(
+          value =>
+            value !== null &&
+            value !== undefined &&
+            value !== ""
+        )
+    )
+  ].sort();
+
+}
+
+
+function populateSelect(
+  elementId,
+  values
+) {
+
+  const select =
+    document.getElementById(
+      elementId
+    );
+
+
+  values.forEach(value => {
 
     const option =
-      document.createElement("option");
+      document.createElement(
+        "option"
+      );
 
-    option.value = department;
-    option.textContent = department;
 
-    departmentFilter.appendChild(option);
+    option.value = value;
+    option.textContent = value;
+
+
+    select.appendChild(option);
 
   });
 
-
-  yearFilter.addEventListener(
-    "change",
-    updateDashboard
-  );
+}
 
 
-  departmentFilter.addEventListener(
-    "change",
-    updateDashboard
-  );
+function resetFilters() {
+
+  document
+    .getElementById("yearFilter")
+    .value =
+      "all";
+
+
+  document
+    .getElementById(
+      "departmentFilter"
+    )
+    .value =
+      "all";
+
+
+  document
+    .getElementById(
+      "studentTypeFilter"
+    )
+    .value =
+      "all";
+
+
+  document
+    .getElementById(
+      "riskFilter"
+    )
+    .value =
+      "all";
+
+
+  updateDashboard();
+
+}
+
+
+function getFilteredData() {
+
+  const year =
+    document
+      .getElementById("yearFilter")
+      .value;
+
+
+  const department =
+    document
+      .getElementById(
+        "departmentFilter"
+      )
+      .value;
+
+
+  const studentType =
+    document
+      .getElementById(
+        "studentTypeFilter"
+      )
+      .value;
+
+
+  const risk =
+    document
+      .getElementById("riskFilter")
+      .value;
+
+
+  return originalData.filter(row => {
+
+    const yearMatch =
+      year === "all" ||
+      String(row.year) === year;
+
+
+    const departmentMatch =
+      department === "all" ||
+      row.department === department;
+
+
+    const typeMatch =
+      studentType === "all" ||
+      row.student_type === studentType;
+
+
+    const riskMatch =
+      risk === "all" ||
+      row.risk_level === risk;
+
+
+    return (
+      yearMatch &&
+      departmentMatch &&
+      typeMatch &&
+      riskMatch
+    );
+
+  });
 
 }
 
 
 function createCharts() {
 
-  const enrollmentContext =
-    document
-      .getElementById("enrollmentChart")
-      .getContext("2d");
+  createEnrollmentChart();
 
+  createRiskChart();
+
+  createDepartmentChart();
+
+}
+
+
+function createEnrollmentChart() {
 
   enrollmentChart =
     new Chart(
-      enrollmentContext,
+      document.getElementById(
+        "enrollmentChart"
+      ),
       {
-        type: "bar",
+        type: "line",
 
         data: {
           labels: [],
+
           datasets: [
             {
-              label: "Enrollment",
+              label: "Students",
               data: [],
-              backgroundColor: "#2e75b6",
-              borderRadius: 5
+
+              borderColor:
+                colors.blue,
+
+              backgroundColor:
+                colors.lightBlue,
+
+              fill: true,
+
+              tension: 0.3,
+
+              pointRadius: 4,
+
+              pointHoverRadius: 7
             }
           ]
         },
@@ -120,6 +302,11 @@ function createCharts() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
+
+          interaction: {
+            intersect: false,
+            mode: "index"
+          },
 
           plugins: {
             legend: {
@@ -136,28 +323,37 @@ function createCharts() {
       }
     );
 
-
-  const retentionContext =
-    document
-      .getElementById("retentionChart")
-      .getContext("2d");
+}
 
 
-  retentionChart =
+function createRiskChart() {
+
+  riskChart =
     new Chart(
-      retentionContext,
+      document.getElementById(
+        "riskChart"
+      ),
       {
-        type: "line",
+        type: "doughnut",
 
         data: {
-          labels: [],
+          labels: [
+            "Low",
+            "Medium",
+            "High"
+          ],
+
           datasets: [
             {
-              label: "Retention rate",
               data: [],
-              borderColor: "#2e75b6",
-              backgroundColor: "#2e75b6",
-              tension: 0.3
+
+              backgroundColor: [
+                colors.green,
+                colors.orange,
+                colors.red
+              ],
+
+              borderWidth: 0
             }
           ]
         },
@@ -166,15 +362,11 @@ function createCharts() {
           responsive: true,
           maintainAspectRatio: false,
 
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
+          cutout: "62%",
 
-              ticks: {
-                callback: value =>
-                  `${value}%`
-              }
+          plugins: {
+            legend: {
+              position: "bottom"
             }
           }
         }
@@ -184,114 +376,232 @@ function createCharts() {
 }
 
 
-function getFilteredData() {
+function createDepartmentChart() {
 
-  const selectedYear =
-    document
-      .getElementById("yearFilter")
-      .value;
+  departmentChart =
+    new Chart(
+      document.getElementById(
+        "departmentChart"
+      ),
+      {
+        type: "bar",
+
+        data: {
+          labels: [],
+
+          datasets: [
+            {
+              label:
+                "Undergraduate",
+
+              data: [],
+
+              backgroundColor:
+                colors.blue
+            },
+
+            {
+              label:
+                "Graduate",
+
+              data: [],
+
+              backgroundColor:
+                colors.navy
+            }
+          ]
+        },
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+
+          onClick:
+            function(
+              event,
+              elements
+            ) {
+
+              if (
+                elements.length === 0
+              ) {
+                return;
+              }
 
 
-  const selectedDepartment =
-    document
-      .getElementById("departmentFilter")
-      .value;
+              const index =
+                elements[0].index;
 
 
-  return originalData.filter(row => {
-
-    const yearMatch =
-      selectedYear === "all" ||
-      row.year === Number(selectedYear);
-
-
-    const departmentMatch =
-      selectedDepartment === "all" ||
-      row.department === selectedDepartment;
+              const department =
+                this.data.labels[
+                  index
+                ];
 
 
-    return yearMatch && departmentMatch;
+              document
+                .getElementById(
+                  "departmentFilter"
+                )
+                .value =
+                  department;
 
-  });
+
+              updateDashboard();
+
+            },
+
+          scales: {
+
+            x: {
+              stacked: true
+            },
+
+            y: {
+              stacked: true,
+              beginAtZero: true
+            }
+
+          }
+        }
+      }
+    );
 
 }
 
 
 function updateDashboard() {
 
-  const filteredData =
+  filteredData =
     getFilteredData();
 
 
-  updateMetrics(filteredData);
+  updateMetrics();
 
-  updateEnrollmentChart(filteredData);
+  updateEnrollmentChart();
 
-  updateRetentionChart(filteredData);
+  updateRiskChart();
+
+  updateDepartmentChart();
+
+  updateScatterPlot();
+
+  updateRetentionHeatmap();
+
+  updateStudentTable();
 
 }
 
 
-function updateMetrics(data) {
+function updateMetrics() {
 
-  const totalEnrollment =
-    data.reduce(
-      (sum, row) =>
-        sum + row.enrollment,
-      0
-    );
+  const count =
+    filteredData.length;
 
 
-  const averageRetention =
-    data.length > 0
-      ? data.reduce(
+  const retained =
+    filteredData.filter(
+      row =>
+        row.retained === "Yes"
+    ).length;
+
+
+  const highRisk =
+    filteredData.filter(
+      row =>
+        row.risk_level === "High"
+    ).length;
+
+
+  const avgGPA =
+    count > 0
+      ? filteredData.reduce(
           (sum, row) =>
-            sum + row.retention,
+            sum +
+            Number(row.gpa),
           0
-        ) / data.length
+        ) / count
       : 0;
 
 
-  const totalRisk =
-    data.reduce(
-      (sum, row) =>
-        sum + row.risk,
-      0
-    );
+  const retentionRate =
+    count > 0
+      ? retained /
+        count *
+        100
+      : 0;
+
+
+  const highRiskRate =
+    count > 0
+      ? highRisk /
+        count *
+        100
+      : 0;
 
 
   document
-    .getElementById("totalEnrollment")
+    .getElementById(
+      "studentCount"
+    )
     .textContent =
-      totalEnrollment.toLocaleString();
+      count.toLocaleString();
 
 
   document
-    .getElementById("avgRetention")
+    .getElementById(
+      "retentionRate"
+    )
     .textContent =
-      `${averageRetention.toFixed(1)}%`;
+      `${retentionRate.toFixed(1)}%`;
 
 
   document
-    .getElementById("totalRisk")
+    .getElementById(
+      "averageGPA"
+    )
     .textContent =
-      totalRisk.toLocaleString();
+      avgGPA.toFixed(2);
+
+
+  document
+    .getElementById(
+      "highRiskRate"
+    )
+    .textContent =
+      `${highRiskRate.toFixed(1)}%`;
 
 }
 
 
-function updateEnrollmentChart(data) {
+function updateEnrollmentChart() {
 
-  const grouped =
-    groupByDepartment(data);
+  const years =
+    uniqueSortedValues(
+      filteredData,
+      "year"
+    );
+
+
+  const counts =
+    years.map(
+      year =>
+        filteredData.filter(
+          row =>
+            row.year === year
+        ).length
+    );
 
 
   enrollmentChart.data.labels =
-    grouped.map(row => row.department);
+    years;
 
 
-  enrollmentChart.data.datasets[0].data =
-    grouped.map(row => row.enrollment);
+  enrollmentChart
+    .data
+    .datasets[0]
+    .data =
+      counts;
 
 
   enrollmentChart.update();
@@ -299,92 +609,437 @@ function updateEnrollmentChart(data) {
 }
 
 
-function updateRetentionChart(data) {
+function updateRiskChart() {
 
-  const grouped =
-    groupByYear(data);
-
-
-  retentionChart.data.labels =
-    grouped.map(row => row.year);
-
-
-  retentionChart.data.datasets[0].data =
-    grouped.map(row => row.retention);
+  const levels = [
+    "Low",
+    "Medium",
+    "High"
+  ];
 
 
-  retentionChart.update();
-
-}
-
-
-function groupByDepartment(data) {
-
-  const groups = {};
-
-
-  data.forEach(row => {
-
-    if (!groups[row.department]) {
-
-      groups[row.department] = {
-        department: row.department,
-        enrollment: 0
-      };
-
-    }
-
-
-    groups[row.department].enrollment +=
-      row.enrollment;
-
-  });
-
-
-  return Object.values(groups);
-
-}
-
-
-function groupByYear(data) {
-
-  const groups = {};
-
-
-  data.forEach(row => {
-
-    if (!groups[row.year]) {
-
-      groups[row.year] = {
-        year: row.year,
-        retentionTotal: 0,
-        count: 0
-      };
-
-    }
-
-
-    groups[row.year].retentionTotal +=
-      row.retention;
-
-
-    groups[row.year].count += 1;
-
-  });
-
-
-  return Object
-    .values(groups)
-    .map(row => ({
-      year: row.year,
-
-      retention:
-        row.retentionTotal /
-        row.count
-    }))
-    .sort(
-      (a, b) =>
-        a.year - b.year
+  const values =
+    levels.map(
+      level =>
+        filteredData.filter(
+          row =>
+            row.risk_level === level
+        ).length
     );
+
+
+  riskChart
+    .data
+    .datasets[0]
+    .data =
+      values;
+
+
+  riskChart.update();
+
+}
+
+
+function updateDepartmentChart() {
+
+  const departments =
+    uniqueSortedValues(
+      filteredData,
+      "department"
+    );
+
+
+  const undergraduate =
+    departments.map(
+      department =>
+        filteredData.filter(
+          row =>
+            row.department ===
+              department &&
+            row.student_type ===
+              "Undergraduate"
+        ).length
+    );
+
+
+  const graduate =
+    departments.map(
+      department =>
+        filteredData.filter(
+          row =>
+            row.department ===
+              department &&
+            row.student_type ===
+              "Graduate"
+        ).length
+    );
+
+
+  departmentChart.data.labels =
+    departments;
+
+
+  departmentChart
+    .data
+    .datasets[0]
+    .data =
+      undergraduate;
+
+
+  departmentChart
+    .data
+    .datasets[1]
+    .data =
+      graduate;
+
+
+  departmentChart.update();
+
+}
+
+
+function updateScatterPlot() {
+
+  const markerSizes =
+    filteredData.map(
+      row =>
+        6 +
+        Number(
+          row.advising_visits
+        ) *
+        1.5
+    );
+
+
+  const trace = {
+
+    x:
+      filteredData.map(
+        row =>
+          Number(
+            row.credits_completed
+          )
+      ),
+
+    y:
+      filteredData.map(
+        row =>
+          Number(row.gpa)
+      ),
+
+    text:
+      filteredData.map(
+        row =>
+          `${row.student_id}` +
+          `<br>${row.department}` +
+          `<br>${row.student_type}` +
+          `<br>Risk: ${row.risk_level}`
+      ),
+
+    mode: "markers",
+
+    type: "scattergl",
+
+    marker: {
+      size: markerSizes,
+
+      color:
+        filteredData.map(
+          row => {
+
+            if (
+              row.risk_level ===
+              "High"
+            ) {
+              return colors.red;
+            }
+
+
+            if (
+              row.risk_level ===
+              "Medium"
+            ) {
+              return colors.orange;
+            }
+
+
+            return colors.green;
+
+          }
+        ),
+
+      opacity: 0.65
+    },
+
+    hovertemplate:
+      "%{text}" +
+      "<br>Credits: %{x}" +
+      "<br>GPA: %{y:.2f}" +
+      "<extra></extra>"
+
+  };
+
+
+  const layout = {
+
+    margin: {
+      t: 15,
+      r: 20,
+      b: 55,
+      l: 55
+    },
+
+    xaxis: {
+      title:
+        "Credits completed",
+
+      zeroline: false
+    },
+
+    yaxis: {
+      title:
+        "GPA",
+
+      range: [0, 4.05]
+    },
+
+    paper_bgcolor:
+      "rgba(0,0,0,0)",
+
+    plot_bgcolor:
+      "rgba(0,0,0,0)",
+
+    showlegend: false
+
+  };
+
+
+  Plotly.react(
+    "gpaScatter",
+    [trace],
+    layout,
+    {
+      responsive: true,
+      displaylogo: false
+    }
+  );
+
+}
+
+
+function updateRetentionHeatmap() {
+
+  const departments =
+    uniqueSortedValues(
+      filteredData,
+      "department"
+    );
+
+
+  const years =
+    uniqueSortedValues(
+      filteredData,
+      "year"
+    );
+
+
+  const z =
+    departments.map(
+      department => {
+
+        return years.map(
+          year => {
+
+            const subset =
+              filteredData.filter(
+                row =>
+                  row.department ===
+                    department &&
+                  row.year === year
+              );
+
+
+            if (
+              subset.length === 0
+            ) {
+              return null;
+            }
+
+
+            const retained =
+              subset.filter(
+                row =>
+                  row.retained ===
+                  "Yes"
+              ).length;
+
+
+            return (
+              retained /
+              subset.length *
+              100
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+  const trace = {
+
+    type: "heatmap",
+
+    x: years,
+
+    y: departments,
+
+    z: z,
+
+    zmin: 50,
+    zmax: 100,
+
+    colorscale: [
+      [0, "#f3d5d5"],
+      [0.5, "#f2e1b5"],
+      [1, "#cfe3cb"]
+    ],
+
+    hovertemplate:
+      "%{y}" +
+      "<br>Year: %{x}" +
+      "<br>Retention: %{z:.1f}%" +
+      "<extra></extra>"
+
+  };
+
+
+  const layout = {
+
+    margin: {
+      t: 15,
+      r: 25,
+      b: 55,
+      l: 120
+    },
+
+    xaxis: {
+      title:
+        "Academic year"
+    },
+
+    paper_bgcolor:
+      "rgba(0,0,0,0)",
+
+    plot_bgcolor:
+      "rgba(0,0,0,0)"
+
+  };
+
+
+  Plotly.react(
+    "retentionHeatmap",
+    [trace],
+    layout,
+    {
+      responsive: true,
+      displaylogo: false
+    }
+  );
+
+}
+
+
+function updateStudentTable() {
+
+  const tbody =
+    document
+      .querySelector(
+        "#studentTable tbody"
+      );
+
+
+  tbody.innerHTML = "";
+
+
+  const rows =
+    filteredData.slice(
+      0,
+      100
+    );
+
+
+  rows.forEach(row => {
+
+    const tr =
+      document.createElement(
+        "tr"
+      );
+
+
+    tr.innerHTML = `
+      <td>${row.student_id}</td>
+      <td>${row.year}</td>
+      <td>${row.department}</td>
+      <td>${row.student_type}</td>
+      <td>${Number(row.gpa).toFixed(2)}</td>
+      <td>${row.credits_completed}</td>
+      <td>${Number(row.attendance_rate).toFixed(1)}%</td>
+      <td class="risk-${row.risk_level.toLowerCase()}">
+        ${row.risk_level}
+      </td>
+      <td>${row.retained}</td>
+    `;
+
+
+    tbody.appendChild(tr);
+
+  });
+
+
+  document
+    .getElementById(
+      "tableCount"
+    )
+    .textContent =
+      `${rows.length.toLocaleString()} of ${filteredData.length.toLocaleString()}`;
+
+}
+
+
+function uniqueSortedValues(
+  data,
+  field
+) {
+
+  return [
+    ...new Set(
+      data.map(
+        row => row[field]
+      )
+    )
+  ].sort(
+    (a, b) => {
+
+      if (
+        typeof a ===
+          "number" &&
+        typeof b ===
+          "number"
+      ) {
+
+        return a - b;
+
+      }
+
+
+      return String(a)
+        .localeCompare(
+          String(b)
+        );
+
+    }
+  );
 
 }
