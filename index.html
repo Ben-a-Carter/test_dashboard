@@ -14,7 +14,7 @@
       <p class="eyebrow">Center for Applied Analytics</p>
       <h1>School of Applied Science</h1>
       <p class="hero-subtitle">Interactive dashboards for student success, enrollment, workforce, finance, fundraising, accreditation, and strategic communication.</p>
-      </div>
+     </div>
     <button
       id="themeToggle"
       class="theme-toggle"
@@ -45,7 +45,22 @@
           <p class="eyebrow-dark">Filters</p>
           <h2 id="filterTitle">Student success</h2>
         </div>
-        <button id="resetAll" class="primary-button" type="button">Reset all</button>
+        <div class="filter-heading-actions">
+          <button
+            id="anchorFiltersToggle"
+            class="anchor-filters-toggle"
+            type="button"
+            aria-pressed="false"
+            title="Keep filters visible while scrolling"
+          >
+            <span class="anchor-filter-icon" aria-hidden="true">⌖</span>
+            <span id="anchorFiltersLabel">Anchor filters</span>
+          </button>
+
+          <button id="resetAll" class="primary-button" type="button">
+            Reset all
+          </button>
+        </div>
       </div>
       <div id="filterControls"></div>
       <div class="active-filter-block">
