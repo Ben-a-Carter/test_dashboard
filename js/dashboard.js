@@ -53,12 +53,12 @@ function getFiltersAffectingPlot(
   targetSource
 ) {
 
-  const filters =
-    [];
+  const filterMap =
+    new Map();
 
 
   /*
-    Dropdown filters apply to every plot.
+    Dashboard dropdown filters affect every plot.
   */
 
   Object.entries(
@@ -73,38 +73,47 @@ function getFiltersAffectingPlot(
     ) => {
 
       if (
-        value !== "all"
+        value ===
+        "all"
       ) {
 
-        filters.push({
-
-          kind:
-            "dropdown",
-
-          source:
-            field,
-
-          label:
-            formatFilterPart(
-              field,
-              value
-            )
-
-        });
+        return;
 
       }
+
+
+      const filter = {
+
+        kind:
+          "dropdown",
+
+        source:
+          field,
+
+        label:
+          formatFilterPart(
+            field,
+            value
+          )
+
+      };
+
+
+      filterMap.set(
+        filterRecencyKey(
+          filter.kind,
+          filter.source
+        ),
+        filter
+      );
 
     }
   );
 
 
   /*
-    A plot's own action is deliberately excluded from that
-    plot's data in getDataForView(source), so its chip should
-    also be excluded from that plot header.
-
-    Every OTHER plot action is affecting this plot and should
-    therefore be shown here.
+    Chart filters are shown on every plot, including the plot
+    where the filter originated.
   */
 
   Object.entries(
@@ -134,7 +143,7 @@ function getFiltersAffectingPlot(
       }
 
 
-      filters.push({
+      const filter = {
 
         kind:
           "plot",
@@ -159,13 +168,72 @@ function getFiltersAffectingPlot(
               " + "
             )
 
-      });
+      };
+
+
+      filterMap.set(
+        filterRecencyKey(
+          filter.kind,
+          filter.source
+        ),
+        filter
+      );
 
     }
   );
 
 
-  return filters;
+  const ordered =
+    [];
+
+
+  /*
+    First use the explicit application order.
+  */
+
+  filterRecency.forEach(
+    key => {
+
+      if (
+        filterMap.has(
+          key
+        )
+      ) {
+
+        ordered.push(
+          filterMap.get(
+            key
+          )
+        );
+
+
+        filterMap.delete(
+          key
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+    Any active filter not yet present in the recency list is
+    appended. This makes the behavior robust after hot reloads.
+  */
+
+  filterMap.forEach(
+    filter => {
+
+      ordered.push(
+        filter
+      );
+
+    }
+  );
+
+
+  return ordered;
 
 }
 
@@ -183,6 +251,12 @@ function clearAppliedFilter(
       filter.source
     ] =
       "all";
+
+
+    removeFilterFromRecency(
+      "dropdown",
+      filter.source
+    );
 
 
     const select =
@@ -220,6 +294,12 @@ function clearAppliedFilter(
       filter.source
     ] =
       {};
+
+
+    removeFilterFromRecency(
+      "plot",
+      filter.source
+    );
 
   }
 
@@ -297,59 +377,69 @@ function renderPlotFilterChips() {
 
         stack.setAttribute(
           "aria-label",
-          `${filters.length} active filter${filters.length === 1 ? "" : "s"}. Hover or focus to expand.`
+          `${filters.length} active filter${filters.length === 1 ? "" : "s"}. Most recent filter is ${filters[0].label}. Hover or focus to expand.`
         );
 
 
-        const summary =
+        /*
+          Collapsed stack:
+          newest filter is the full top card.
+        */
+
+        const topCard =
           document.createElement(
             "div"
           );
 
 
-        summary.className =
-          "plot-filter-stack-summary";
+        topCard.className =
+          "plot-filter-stack-top";
 
 
-        const summaryText =
-          document.createElement(
-            "span"
-          );
+        topCard.textContent =
+          filters[0].label;
 
 
-        summaryText.className =
-          "plot-filter-stack-summary-text";
-
-
-        summaryText.textContent =
-
-          filters.length ===
-          1
-
-            ? filters[0].label
-
-            : `${filters.length} active filters`;
-
-
-        const chevron =
-          document.createElement(
-            "span"
-          );
-
-
-        chevron.className =
-          "plot-filter-stack-chevron";
-
-
-        chevron.textContent =
-          "⌄";
-
-
-        summary.append(
-          summaryText,
-          chevron
+        stack.appendChild(
+          topCard
         );
 
+
+        /*
+          A small visible sliver of the second-newest filter
+          signals that more than one filter is active.
+        */
+
+        if (
+          filters.length >
+          1
+        ) {
+
+          const secondCard =
+            document.createElement(
+              "div"
+            );
+
+
+          secondCard.className =
+            "plot-filter-stack-second";
+
+
+          secondCard.textContent =
+            filters[1].label;
+
+
+          stack.appendChild(
+            secondCard
+          );
+
+        }
+
+
+        /*
+          Expanded menu contains every active filter,
+          newest first.
+        */
 
         const menu =
           document.createElement(
@@ -443,8 +533,7 @@ function renderPlotFilterChips() {
         );
 
 
-        stack.append(
-          summary,
+        stack.appendChild(
           menu
         );
 
@@ -463,10 +552,38 @@ function renderResets(){renderPlotFilterChips()}
 function renderTrend(){const c=configs[activeTab].trend,d=dataFor('trend'),xs=uniq(d,c.x),bars=xs.map(x=>{const s=d.filter(r=>String(r[c.x])===String(x));return c.valueField?sum(s,c.valueField):s.length}),tr=[{x:xs,y:bars,type:'bar',name:c.valueField||'Count',marker:{color:colors.blue}}];if(c.lineNumeric)tr.push({x:xs,y:xs.map(x=>avgRaw(d.filter(r=>String(r[c.x])===String(x)),c.lineNumeric)),type:'scatter',mode:'lines+markers',name:c.lineNumeric,yaxis:'y2',line:{color:colors.green,width:3}});else if(c.lineField)tr.push({x:xs,y:xs.map(x=>{const s=d.filter(r=>String(r[c.x])===String(x));return s.length?s.filter(r=>String(r[c.lineField])===String(c.lineValue)).length/s.length*100:0}),type:'scatter',mode:'lines+markers',name:c.lineField,yaxis:'y2',line:{color:colors.green,width:3}});Plotly.react('trendChart',tr,themedLayout({margin:{t:15,r:65,b:55,l:60},xaxis:{title:c.x},yaxis:{title:c.valueField||'Count'},yaxis2:{overlaying:'y',side:'right',ticksuffix:c.lineField&&!c.lineNumeric?'%':''},legend:{orientation:'h',y:1.12}}),plotConfig).then(()=>attachCat('trendChart','trend',c.x,p=>p.x))}
 function renderCategory(){const c=configs[activeTab].category,d=dataFor('category'),cats=uniq(d,c.field),stacks=uniq(d,c.stack),tr=stacks.map((sv,i)=>({x:cats,y:cats.map(cat=>{const s=d.filter(r=>String(r[c.field])===String(cat)&&String(r[c.stack])===String(sv));return c.valueField?sum(s,c.valueField):s.length}),type:'bar',name:sv,marker:{color:[colors.blue,colors.navy,colors.purple,colors.green,colors.orange][i%5]}}));Plotly.react('categoryChart',tr,themedLayout({barmode:'stack',margin:{t:15,r:15,b:100,l:55},xaxis:{tickangle:-25},yaxis:{title:c.valueField||'Count'},legend:{orientation:'h',y:1.13}}),plotConfig).then(()=>attachCat('categoryChart','category',c.field,p=>p.x))}
 function renderStatus(){const c=configs[activeTab].status,d=dataFor('status'),labels=uniq(d,c.field),values=labels.map(v=>d.filter(r=>String(r[c.field])===String(v)).length);Plotly.react('statusChart',[{labels,values,type:'pie',hole:.58,textinfo:'percent'}],themedLayout({margin:{t:20,r:20,b:30,l:20},legend:{orientation:'h',y:-.1}}),plotConfig).then(()=>attachCat('statusChart','status',c.field,p=>p.label))}
-function renderScatter(){const c=configs[activeTab].scatter,d=dataFor('scatter'),groups=uniq(d,c.color),tr=groups.map((g,i)=>{const rows=d.filter(r=>String(r[c.color])===String(g));return{x:rows.map(r=>Number(r[c.x])),y:rows.map(r=>Number(r[c.y])),customdata:rows.map(r=>[r.id]),mode:'markers',type:'scattergl',name:g,marker:{size:rows.map(r=>6+Math.min(Math.sqrt(Math.max(Number(r[c.size]||1),1))/8,14)),color:[colors.blue,colors.green,colors.orange,colors.red,colors.purple][i%5],opacity:.65}}});Plotly.react('scatterChart',tr,themedLayout({dragmode:'lasso',margin:{t:15,r:30,b:60,l:60},xaxis:{title:c.x},yaxis:{title:c.y},legend:{orientation:'h',y:1.12}}),plotConfig).then(()=>{const p=document.getElementById('scatterChart');clearListeners(p);p.on('plotly_selected',e=>{if(!e?.points?.length)return;plotFilters.scatter={ids:e.points.map(x=>x.customdata?.[0]).filter(Boolean)};renderDashboard()})})}
-function renderHeatmap(){const c=configs[activeTab].heatmap,d=dataFor('heatmap'),rows=uniq(d,c.row),cols=uniq(d,c.col),z=rows.map(rv=>cols.map(cv=>{const s=d.filter(r=>String(r[c.row])===String(rv)&&String(r[c.col])===String(cv));if(!s.length)return null;return c.numeric?avgRaw(s,c.numeric):s.filter(r=>String(r[c.outcome])===String(c.success)).length/s.length*100}));Plotly.react('heatmapChart',[{type:'heatmap',x:cols,y:rows,z,colorscale:[[0,'#d98686'],[.5,'#efcf8c'],[1,'#8abb7c']]}],themedLayout({margin:{t:20,r:70,b:55,l:150},xaxis:{title:c.col}}),plotConfig).then(()=>{const p=document.getElementById('heatmapChart');clearListeners(p);p.on('plotly_click',e=>{const pt=e.points?.[0];if(!pt)return;plotFilters.heatmap={[c.row]:pt.y,[c.col]:pt.x};renderDashboard()})})}
-function renderDistribution(){const c=configs[activeTab].distribution,d=dataFor('distribution'),cats=uniq(d,c.category),tr=cats.map((cat,i)=>({y:d.filter(r=>String(r[c.category])===String(cat)).map(r=>Number(r[c.value])),type:'box',name:cat,boxpoints:'outliers',marker:{color:[colors.blue,colors.green,colors.orange,colors.purple,colors.navy][i%5]}}));Plotly.react('distributionChart',tr,themedLayout({margin:{t:20,r:20,b:100,l:55},yaxis:{title:c.value},xaxis:{tickangle:-25},showlegend:false}),plotConfig).then(()=>{const p=document.getElementById('distributionChart');clearListeners(p);p.on('plotly_click',e=>{const v=e.points?.[0]?.data?.name;if(!v)return;plotFilters.distribution={[c.category]:v};renderDashboard()})})}
-function renderFlow(){const c=configs[activeTab].flow,d=dataFor('flow'),a=uniq(d,c.first),b=uniq(d,c.second),cc=uniq(d,c.third),labels=[...a,...b,...cc],source=[],target=[],value=[];a.forEach((x,i)=>b.forEach((y,j)=>{const n=d.filter(r=>String(r[c.first])===String(x)&&String(r[c.second])===String(y)).length;if(n){source.push(i);target.push(a.length+j);value.push(n)}}));b.forEach((x,i)=>cc.forEach((y,j)=>{const n=d.filter(r=>String(r[c.second])===String(x)&&String(r[c.third])===String(y)).length;if(n){source.push(a.length+i);target.push(a.length+b.length+j);value.push(n)}}));Plotly.react('flowChart',[{type:'sankey',node:{pad:16,thickness:17,label:labels},link:{source,target,value}}],themedLayout({margin:{t:20,r:20,b:20,l:20}}),plotConfig).then(()=>{const p=document.getElementById('flowChart');clearListeners(p);p.on('plotly_click',e=>{const label=e.points?.[0]?.label;if(!label)return;let f=a.includes(label)?c.first:b.includes(label)?c.second:cc.includes(label)?c.third:null;if(!f)return;plotFilters.flow={[f]:label};renderDashboard()})})}
+function renderScatter(){const c=configs[activeTab].scatter,d=dataFor('scatter'),groups=uniq(d,c.color),tr=groups.map((g,i)=>{const rows=d.filter(r=>String(r[c.color])===String(g));return{x:rows.map(r=>Number(r[c.x])),y:rows.map(r=>Number(r[c.y])),customdata:rows.map(r=>[r.id]),mode:'markers',type:'scattergl',name:g,marker:{size:rows.map(r=>6+Math.min(Math.sqrt(Math.max(Number(r[c.size]||1),1))/8,14)),color:[colors.blue,colors.green,colors.orange,colors.red,colors.purple][i%5],opacity:.65}}});Plotly.react('scatterChart',tr,themedLayout({dragmode:'lasso',margin:{t:15,r:30,b:60,l:60},xaxis:{title:c.x},yaxis:{title:c.y},legend:{orientation:'h',y:1.12}}),plotConfig).then(()=>{const p=document.getElementById('scatterChart');clearListeners(p);p.on('plotly_selected',e=>{if(!e?.points?.length)return;markFilterAsMostRecent(
+            "plot",
+            "scatter"
+          );
+
+
+          plotFilters.scatter =
+            {ids:e.points.map(x=>x.customdata?.[0]).filter(Boolean)};renderDashboard()})})}
+function renderHeatmap(){const c=configs[activeTab].heatmap,d=dataFor('heatmap'),rows=uniq(d,c.row),cols=uniq(d,c.col),z=rows.map(rv=>cols.map(cv=>{const s=d.filter(r=>String(r[c.row])===String(rv)&&String(r[c.col])===String(cv));if(!s.length)return null;return c.numeric?avgRaw(s,c.numeric):s.filter(r=>String(r[c.outcome])===String(c.success)).length/s.length*100}));Plotly.react('heatmapChart',[{type:'heatmap',x:cols,y:rows,z,colorscale:[[0,'#d98686'],[.5,'#efcf8c'],[1,'#8abb7c']]}],themedLayout({margin:{t:20,r:70,b:55,l:150},xaxis:{title:c.col}}),plotConfig).then(()=>{const p=document.getElementById('heatmapChart');clearListeners(p);p.on('plotly_click',e=>{const pt=e.points?.[0];if(!pt)return;markFilterAsMostRecent(
+            "plot",
+            "heatmap"
+          );
+
+
+          plotFilters.heatmap =
+            {[c.row]:pt.y,[c.col]:pt.x};renderDashboard()})})}
+function renderDistribution(){const c=configs[activeTab].distribution,d=dataFor('distribution'),cats=uniq(d,c.category),tr=cats.map((cat,i)=>({y:d.filter(r=>String(r[c.category])===String(cat)).map(r=>Number(r[c.value])),type:'box',name:cat,boxpoints:'outliers',marker:{color:[colors.blue,colors.green,colors.orange,colors.purple,colors.navy][i%5]}}));Plotly.react('distributionChart',tr,themedLayout({margin:{t:20,r:20,b:100,l:55},yaxis:{title:c.value},xaxis:{tickangle:-25},showlegend:false}),plotConfig).then(()=>{const p=document.getElementById('distributionChart');clearListeners(p);p.on('plotly_click',e=>{const v=e.points?.[0]?.data?.name;if(!v)return;markFilterAsMostRecent(
+            "plot",
+            "distribution"
+          );
+
+
+          plotFilters.distribution =
+            {[c.category]:v};renderDashboard()})})}
+function renderFlow(){const c=configs[activeTab].flow,d=dataFor('flow'),a=uniq(d,c.first),b=uniq(d,c.second),cc=uniq(d,c.third),labels=[...a,...b,...cc],source=[],target=[],value=[];a.forEach((x,i)=>b.forEach((y,j)=>{const n=d.filter(r=>String(r[c.first])===String(x)&&String(r[c.second])===String(y)).length;if(n){source.push(i);target.push(a.length+j);value.push(n)}}));b.forEach((x,i)=>cc.forEach((y,j)=>{const n=d.filter(r=>String(r[c.second])===String(x)&&String(r[c.third])===String(y)).length;if(n){source.push(a.length+i);target.push(a.length+b.length+j);value.push(n)}}));Plotly.react('flowChart',[{type:'sankey',node:{pad:16,thickness:17,label:labels},link:{source,target,value}}],themedLayout({margin:{t:20,r:20,b:20,l:20}}),plotConfig).then(()=>{const p=document.getElementById('flowChart');clearListeners(p);p.on('plotly_click',e=>{const label=e.points?.[0]?.label;if(!label)return;let f=a.includes(label)?c.first:b.includes(label)?c.second:cc.includes(label)?c.third:null;if(!f)return;markFilterAsMostRecent(
+            "plot",
+            "flow"
+          );
+
+
+          plotFilters.flow =
+            {[f]:label};renderDashboard()})})}
 function attachCat(id,source,field,getter){const p=document.getElementById(id);clearListeners(p);p.on('plotly_click',e=>{const pt=e.points?.[0];if(!pt)return;plotFilters[source]={[field]:getter(pt)};renderDashboard()});p.on('plotly_hover',e=>{const pt=e.points?.[0];if(!pt)return;const v=getter(pt);document.getElementById('hoverStatus').textContent=`Highlighting ${field}: ${v}`;highlightTable(field,v)});p.on('plotly_unhover',()=>{document.getElementById('hoverStatus').textContent='Hover over a categorical mark to highlight related records. Click it to filter the other views.';highlightTable(null,null)})}function clearListeners(p){if(!p?.removeAllListeners)return;['plotly_click','plotly_hover','plotly_unhover','plotly_selected'].forEach(n=>p.removeAllListeners(n))}
 function renderTable(){const h=document.getElementById('tableHeader'),tb=document.querySelector('#dataTable tbody');h.innerHTML='';tb.innerHTML='';const fields=Object.keys(activeData[0]||{});if(!tableState.sortField||!fields.includes(tableState.sortField))tableState.sortField=fields[0];fields.forEach(f=>{const th=document.createElement('th'),b=document.createElement('button');b.className='sort-button';b.type='button';b.textContent=prettify(f);if(tableState.sortField===f){const s=document.createElement('span');s.className='sort-indicator';s.textContent=tableState.sortDirection==='asc'?' ▲':' ▼';b.appendChild(s)}b.addEventListener('click',()=>{if(tableState.sortField===f)tableState.sortDirection=tableState.sortDirection==='asc'?'desc':'asc';else{tableState.sortField=f;tableState.sortDirection='asc'}renderTable()});th.appendChild(b);h.appendChild(th)});const sorted=[...filteredData].sort((a,b)=>compare(a[tableState.sortField],b[tableState.sortField],tableState.sortDirection)),shown=sorted.slice(0,250),ranges=numRanges(filteredData,fields);shown.forEach(row=>{const tr=document.createElement('tr');tr.dataset.recordId=row.id;fields.forEach(f=>{const td=document.createElement('td');td.textContent=formatVal(f,row[f]);if(ranges[f]&&Number.isFinite(Number(row[f])))td.style.background=numColor(Number(row[f]),ranges[f]);tr.appendChild(td)});tb.appendChild(tr)});document.getElementById('tableCount').textContent=`${shown.length.toLocaleString()} shown of ${filteredData.length.toLocaleString()}`}
 function compare(a,b,d){const f=d==='asc'?1:-1,an=Number(a),bn=Number(b);return Number.isFinite(an)&&Number.isFinite(bn)?(an-bn)*f:String(a??'').localeCompare(String(b??''))*f}function prettify(f){return f.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}function formatVal(f,v){if(v===null||v===undefined)return'';if(f.includes('propensity'))return`${(Number(v)*100).toFixed(1)}%`;if(/salary|budget|actual|amount|capacity|aid_offer|financial_need/.test(f))return`$${Math.round(Number(v)).toLocaleString()}`;if(typeof v==='number'&&!Number.isInteger(v))return v.toFixed(1);return String(v)}function numRanges(d,fields){const o={};fields.forEach(f=>{const v=d.map(r=>Number(r[f])).filter(Number.isFinite);if(v.length)o[f]={min:Math.min(...v),max:Math.max(...v)}});return o}function numColor(v,r){const t=clamp((v-r.min)/((r.max-r.min)||1),0,1),h=210-t*105;return getTheme()==='dark'?`hsl(${h} 38% ${18+t*7}%)`:`hsl(${h} 55% ${96-t*14}%)`}function highlightTable(f,v){document.querySelectorAll('#dataTable tbody tr').forEach(row=>{if(!f){row.style.opacity='1';return}const rec=filteredData.find(x=>x.id===row.dataset.recordId);if(rec)row.style.opacity=String(rec[f])===String(v)?'1':'.22'})}
