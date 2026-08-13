@@ -15,14 +15,8 @@
       <h1>School of Applied Science</h1>
       <p class="hero-subtitle">Interactive dashboards for student success, enrollment, workforce, finance, fundraising, accreditation, and strategic communication.</p>
     </div>
-    <button
-      id="themeToggle"
-      class="theme-toggle"
-      type="button"
-      aria-label="Change appearance. Current setting: System"
-      title="System. Click to switch to Light, then alternate between Light and Dark."
-    >
-      <span id="themeIcon" aria-hidden="true">◐</span>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Change appearance. Current setting: System" title="System. Click to switch to Light, then alternate between Light and Dark.">
+      <span id="themeIcon" aria-hidden="true">&#9680;</span>
       <span id="themeLabel">System</span>
     </button>
   </div>
@@ -30,10 +24,10 @@
   <nav class="tab-nav" aria-label="Dashboard categories">
     <button class="tab-button active" data-tab="student" type="button">Student success</button>
     <button class="tab-button" data-tab="enrollment" type="button">Enrollment forecasting</button>
-    <button class="tab-button" data-tab="workforce" type="button">Faculty & staff</button>
-    <button class="tab-button" data-tab="budget" type="button">Budget & resources</button>
+    <button class="tab-button" data-tab="workforce" type="button">Faculty &amp; staff</button>
+    <button class="tab-button" data-tab="budget" type="button">Budget &amp; resources</button>
     <button class="tab-button" data-tab="donor" type="button">Donor development</button>
-    <button class="tab-button" data-tab="quality" type="button">Accreditation & quality</button>
+    <button class="tab-button" data-tab="quality" type="button">Accreditation &amp; quality</button>
     <button class="tab-button" data-tab="communication" type="button">Strategic communication</button>
   </nav>
 </header>
@@ -46,29 +40,19 @@
           <p class="eyebrow-dark">Filters</p>
           <h2 id="filterTitle">Student success</h2>
         </div>
-
         <div class="filter-heading-actions">
-          <button
-            id="anchorFiltersToggle"
-            class="anchor-filters-toggle"
-            type="button"
-            aria-pressed="false"
-            title="Keep filters visible while scrolling"
-          >
-            <span class="anchor-filter-icon" aria-hidden="true">⌖</span>
+          <button id="anchorFiltersToggle" class="anchor-filters-toggle" type="button" aria-pressed="false" title="Keep filters visible while scrolling">
+            <span class="anchor-filter-icon" aria-hidden="true">&#8982;</span>
             <span id="anchorFiltersLabel">Anchor filters</span>
           </button>
-
-          <button id="resetAll" class="primary-button" type="button">
-            Reset all
-          </button>
+          <button id="resetAll" class="primary-button" type="button">Reset all</button>
         </div>
       </div>
 
       <div id="filterControls"></div>
 
       <div class="active-filter-block">
-        <span class="active-filter-title">Active filters & actions</span>
+        <span class="active-filter-title">Active filters &amp; actions</span>
         <div id="activeFilters" class="active-filter-list"></div>
       </div>
     </div>
@@ -83,142 +67,53 @@
 
     <section class="metrics" id="metrics"></section>
 
-    <section class="hover-status" id="hoverStatus">
-      Hover over a categorical mark to highlight related records. Click it to filter the other views.
-    </section>
+    <section class="hover-status" id="hoverStatus">Hover over a categorical mark to highlight related records. Click it to filter the other views.</section>
 
     <section class="dashboard-grid">
       <article class="chart-card chart-full">
-        <div class="chart-heading">
-          <div>
-            <h3 id="trendTitle"></h3>
-            <p id="trendHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="trend"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="trendTitle"></h3><p id="trendHelp"></p></div><div class="plot-actions" data-filter-chips="trend" aria-label="Filters affecting this plot"></div></div>
         <div id="trendChart" class="plotly-chart large-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading">
-          <div>
-            <h3 id="categoryTitle"></h3>
-            <p id="categoryHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="category"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="categoryTitle"></h3><p id="categoryHelp"></p></div><div class="plot-actions" data-filter-chips="category" aria-label="Filters affecting this plot"></div></div>
         <div id="categoryChart" class="plotly-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading">
-          <div>
-            <h3 id="statusTitle"></h3>
-            <p id="statusHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="status"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="statusTitle"></h3><p id="statusHelp"></p></div><div class="plot-actions" data-filter-chips="status" aria-label="Filters affecting this plot"></div></div>
         <div id="statusChart" class="plotly-chart"></div>
       </article>
 
       <article class="chart-card chart-full">
-        <div class="chart-heading">
-          <div>
-            <h3 id="scatterTitle"></h3>
-            <p id="scatterHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="scatter"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="scatterTitle"></h3><p id="scatterHelp"></p></div><div class="plot-actions" data-filter-chips="scatter" aria-label="Filters affecting this plot"></div></div>
         <div id="scatterChart" class="plotly-chart large-chart"></div>
       </article>
 
       <article class="chart-card chart-full">
-        <div class="chart-heading">
-          <div>
-            <h3 id="heatmapTitle"></h3>
-            <p id="heatmapHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="heatmap"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="heatmapTitle"></h3><p id="heatmapHelp"></p></div><div class="plot-actions" data-filter-chips="heatmap" aria-label="Filters affecting this plot"></div></div>
         <div id="heatmapChart" class="plotly-chart heatmap-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading">
-          <div>
-            <h3 id="distributionTitle"></h3>
-            <p id="distributionHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="distribution"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="distributionTitle"></h3><p id="distributionHelp"></p></div><div class="plot-actions" data-filter-chips="distribution" aria-label="Filters affecting this plot"></div></div>
         <div id="distributionChart" class="plotly-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading">
-          <div>
-            <h3 id="flowTitle"></h3>
-            <p id="flowHelp"></p>
-          </div>
-          <div
-            class="plot-actions"
-            data-filter-chips="flow"
-            aria-label="Filters affecting this plot"
-          ></div>
-        </div>
+        <div class="chart-heading"><div><h3 id="flowTitle"></h3><p id="flowHelp"></p></div><div class="plot-actions" data-filter-chips="flow" aria-label="Filters affecting this plot"></div></div>
         <div id="flowChart" class="plotly-chart"></div>
       </article>
     </section>
 
     <section class="table-card">
-      <div class="table-heading">
-        <div>
-          <h3 id="tableTitle">Records</h3>
-          <p>Click any column heading to sort. Numeric columns use a within-column color scale.</p>
-        </div>
-        <div id="tableCount" class="table-count"></div>
-      </div>
-
-      <div class="table-wrapper">
-        <table id="dataTable">
-          <thead>
-            <tr id="tableHeader"></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+      <div class="table-heading"><div><h3 id="tableTitle">Records</h3><p>Click any column heading to sort. Numeric columns use a within-column color scale.</p></div><div id="tableCount" class="table-count"></div></div>
+      <div class="table-wrapper"><table id="dataTable"><thead><tr id="tableHeader"></tr></thead><tbody></tbody></table></div>
     </section>
   </main>
 </div>
 
-<footer class="footer">
-  All data are simulated for demonstration purposes only.
-</footer>
-
+<footer class="footer">All data are simulated for demonstration purposes only.</footer>
 <script src="js/dashboard.js"></script>
 </body>
 </html>
