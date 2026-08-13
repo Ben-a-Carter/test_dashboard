@@ -12,12 +12,21 @@
   <div class="hero-top">
     <div>
       <p class="eyebrow">Center for Applied Analytics</p>
-      <h1>Institutional Analytics Dashboard</h1>
+      <h1>School of Applied Science</h1>
       <p class="hero-subtitle">Interactive dashboards for student success, enrollment, workforce, finance, fundraising, accreditation, and strategic communication.</p>
     </div>
-    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light and dark mode">
+    <button
+      id="themeToggle"
+      class="theme-toggle"
+      type="button"
+      aria-label="Change appearance. Current setting: System"
+      title="Appearance: System. Click to cycle System, Light, and Dark."
+    >
       <span id="themeIcon" aria-hidden="true">◐</span>
-      <span id="themeLabel">Dark</span>
+      <span class="theme-toggle-copy">
+        <span class="theme-toggle-caption">Appearance</span>
+        <span id="themeLabel">System</span>
+      </span>
     </button>
   </div>
   <nav class="tab-nav" aria-label="Dashboard categories">
@@ -62,37 +71,37 @@
 
     <section class="dashboard-grid">
       <article class="chart-card chart-full">
-        <div class="chart-heading"><div><h3 id="trendTitle"></h3><p id="trendHelp"></p></div><button class="plot-reset" data-reset="trend" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="trendTitle"></h3><p id="trendHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="trend">No chart filter</span><button class="plot-reset" data-reset="trend" type="button">Reset this plot</button></div></div>
         <div id="trendChart" class="plotly-chart large-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading"><div><h3 id="categoryTitle"></h3><p id="categoryHelp"></p></div><button class="plot-reset" data-reset="category" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="categoryTitle"></h3><p id="categoryHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="category">No chart filter</span><button class="plot-reset" data-reset="category" type="button">Reset this plot</button></div></div>
         <div id="categoryChart" class="plotly-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading"><div><h3 id="statusTitle"></h3><p id="statusHelp"></p></div><button class="plot-reset" data-reset="status" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="statusTitle"></h3><p id="statusHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="status">No chart filter</span><button class="plot-reset" data-reset="status" type="button">Reset this plot</button></div></div>
         <div id="statusChart" class="plotly-chart"></div>
       </article>
 
       <article class="chart-card chart-full">
-        <div class="chart-heading"><div><h3 id="scatterTitle"></h3><p id="scatterHelp"></p></div><button class="plot-reset" data-reset="scatter" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="scatterTitle"></h3><p id="scatterHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="scatter">No chart filter</span><button class="plot-reset" data-reset="scatter" type="button">Reset this plot</button></div></div>
         <div id="scatterChart" class="plotly-chart large-chart"></div>
       </article>
 
       <article class="chart-card chart-full">
-        <div class="chart-heading"><div><h3 id="heatmapTitle"></h3><p id="heatmapHelp"></p></div><button class="plot-reset" data-reset="heatmap" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="heatmapTitle"></h3><p id="heatmapHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="heatmap">No chart filter</span><button class="plot-reset" data-reset="heatmap" type="button">Reset this plot</button></div></div>
         <div id="heatmapChart" class="plotly-chart heatmap-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading"><div><h3 id="distributionTitle"></h3><p id="distributionHelp"></p></div><button class="plot-reset" data-reset="distribution" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="distributionTitle"></h3><p id="distributionHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="distribution">No chart filter</span><button class="plot-reset" data-reset="distribution" type="button">Reset this plot</button></div></div>
         <div id="distributionChart" class="plotly-chart"></div>
       </article>
 
       <article class="chart-card">
-        <div class="chart-heading"><div><h3 id="flowTitle"></h3><p id="flowHelp"></p></div><button class="plot-reset" data-reset="flow" type="button">Reset this plot</button></div>
+        <div class="chart-heading"><div><h3 id="flowTitle"></h3><p id="flowHelp"></p></div><div class="plot-actions"><span class="plot-filter-label" data-filter-label="flow">No chart filter</span><button class="plot-reset" data-reset="flow" type="button">Reset this plot</button></div></div>
         <div id="flowChart" class="plotly-chart"></div>
       </article>
     </section>
