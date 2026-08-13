@@ -35,6 +35,15 @@ function formatFilterPart(
   }
 
 
+  if (
+    field === "department"
+  ) {
+
+    return `${value}`;
+
+  }
+
+
   return `${prettify(field)}: ${value}`;
 
 }
@@ -287,12 +296,26 @@ function renderPlotFilterChips() {
 
             const chip =
               document.createElement(
-                "span"
+                "button"
               );
+
+
+            chip.type =
+              "button";
 
 
             chip.className =
               "plot-filter-chip";
+
+
+            chip.setAttribute(
+              "aria-label",
+              `Remove filter ${filter.label}`
+            );
+
+
+            chip.title =
+              `Click to delete ${filter.label}`;
 
 
             const text =
@@ -309,35 +332,27 @@ function renderPlotFilterChips() {
               filter.label;
 
 
-            const close =
+            const overlay =
               document.createElement(
-                "button"
+                "span"
               );
 
 
-            close.type =
-              "button";
+            overlay.className =
+              "plot-filter-chip-overlay";
 
 
-            close.className =
-              "plot-filter-chip-close";
+            overlay.textContent =
+              "Click to delete";
 
 
-            close.setAttribute(
-              "aria-label",
-              `Remove filter ${filter.label}`
+            chip.append(
+              text,
+              overlay
             );
 
 
-            close.title =
-              `Remove ${filter.label}`;
-
-
-            close.textContent =
-              "×";
-
-
-            close.addEventListener(
+            chip.addEventListener(
               "click",
               event => {
 
@@ -351,12 +366,6 @@ function renderPlotFilterChips() {
                 );
 
               }
-            );
-
-
-            chip.append(
-              text,
-              close
             );
 
 
