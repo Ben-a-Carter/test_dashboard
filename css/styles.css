@@ -232,72 +232,705 @@ button, select { font: inherit; }
    ========================================================= */
 
 /*
- * Compact version of the solid padlock construction:
- * solid rounded body + heavy rounded shackle + keyhole.
- * Everything uses currentColor / the button background so the
- * icon follows the active dashboard theme automatically.
+ * Solid padlock artwork inspired by the supplied visual reference.
+ * The icon is built entirely with CSS and currentColor so it
+ * automatically follows the active light/dark theme.
  */
 .anchor-filter-icon {
   position: relative;
   display: inline-block;
   width: 18px;
-  height: 15px;
-  margin-top: 5px;
-  border-radius: 3px;
-  background: currentColor;
-  color: inherit;
+  height: 19px;
+  color: currentColor;
   flex: 0 0 auto;
 }
 
-/* Heavy rounded shackle */
+/* Solid lock body */
+.anchor-filter-icon::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  bottom: 0;
+  width: 16px;
+  height: 11px;
+  border-radius: 3px;
+  background: currentColor;
+}
+
+/* Thick rounded shackle: closed by default */
 .anchor-filter-icon::before {
   content: "";
   position: absolute;
-  top: -8px;
   left: 4px;
+  top: 0;
   width: 10px;
-  height: 9px;
-  box-sizing: border-box;
-  border: 2px solid currentColor;
+  height: 12px;
+  border: 3px solid currentColor;
   border-bottom: 0;
-  border-radius: 7px 7px 0 0;
-  transform-origin: 9px 9px;
+  border-radius: 8px 8px 0 0;
+  transform-origin: 9px 11px;
   transition:
     transform .16s ease,
     left .16s ease,
     top .16s ease;
 }
 
-/* Small keyhole cutout */
-.anchor-filter-icon::after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 8px;
-  width: 3px;
-  height: 5px;
-  border-radius: 2px;
-  background: var(--panel-secondary);
-  transition: background .14s ease;
-}
-
 /*
- * Keep the keyhole visually cut out when the button changes
- * background on hover or in its active state.
+ * When the filters follow scrolling, open the shackle.
+ * The body remains fixed so the two states read like a matched
+ * locked/unlocked icon pair.
  */
-.anchor-filters-toggle:hover .anchor-filter-icon::after {
-  background: var(--panel-hover);
-}
-
-.anchor-filters-toggle[aria-pressed="true"]
-.anchor-filter-icon::after {
-  background: var(--blue-light);
-}
-
-/* Open shackle = filters follow scrolling. */
 .anchor-filters-toggle[aria-pressed="true"]
 .anchor-filter-icon::before {
   left: 7px;
-  top: -9px;
+  top: -1px;
   transform: rotate(28deg);
+}
+
+.anchor-filters-toggle:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+
+#filterControls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.filter-group label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+select {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+}
+
+.active-filter-block {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.active-filter-title {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.active-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: flex-start;
+}
+.no-filter {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.active-filter-action {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--blue-light);
+  color: var(--navy);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+}
+.active-filter-action-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 30px;
+  padding: 5px 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity .14s ease;
+}
+.active-filter-action-remove {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  background: rgba(255,255,255,.84);
+  color: var(--text-primary);
+  opacity: 0;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .14s ease;
+}
+[data-theme="dark"] .active-filter-action-remove {
+  background: rgba(26,30,36,.86);
+}
+.active-filter-action:hover .active-filter-action-remove,
+.active-filter-action:focus-visible .active-filter-action-remove { opacity: 1; }
+.active-filter-action:hover .active-filter-action-label,
+.active-filter-action:focus-visible .active-filter-action-label { opacity: .18; }
+.active-filter-action:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.dashboard-intro { margin-bottom: 18px; }
+.dashboard-intro h2 {
+  font-size: 24px;
+  margin-top: 3px;
+}
+.dashboard-intro p:last-child {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  max-width: 900px;
+  line-height: 1.55;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.metric-card { padding: 18px; }
+.metric-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+.metric-value {
+  margin-top: 8px;
+  color: var(--navy);
+  font-size: 28px;
+  font-weight: 750;
+}
+.hover-status {
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 20px;
+}
+.chart-card {
+  position: relative;
+  min-width: 0;
+  padding: 20px;
+}
+.chart-full { grid-column: 1 / -1; }
+.chart-heading { margin-bottom: 10px; }
+.chart-heading h3,
+.table-heading h3 { font-size: 17px; }
+.chart-heading p,
+.table-heading p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.plotly-chart {
+  width: 100%;
+  height: 370px;
+  cursor: crosshair;
+}
+.large-chart { height: 430px; }
+.heatmap-chart { height: 410px; }
+.plotly-chart .hoverlayer { pointer-events: none; }
+.modebar-container,
+.js-plotly-plot .plotly .modebar { display: none !important; }
+
+.plot-actions {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 360px;
+  padding-bottom: 7px;
+}
+.plot-filter-empty {
+  display: inline-flex;
+  align-items: center;
+  min-height: 31px;
+  padding: 7px 10px;
+  background: var(--panel-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.plot-filter-stack {
+  position: relative;
+  width: 220px;
+  max-width: 100%;
+  min-height: 38px;
+  overflow: visible;
+  outline: none;
+}
+.plot-filter-stack-top {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  min-height: 31px;
+  padding: 7px 11px;
+  overflow: hidden;
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.plot-filter-stack-second {
+  position: absolute;
+  top: -7px;
+  left: 14px;
+  right: -14px;
+  z-index: 5;
+  height: 31px;
+  padding: 7px 10px;
+  overflow: hidden;
+  background: var(--panel-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: .72;
+  pointer-events: none;
+}
+.plot-filter-stack-menu {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  min-width: 220px;
+  padding: 8px;
+  background: rgba(255,255,255,.94);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-7px);
+  pointer-events: none;
+  transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
+}
+[data-theme="dark"] .plot-filter-stack-menu {
+  background: rgba(26,30,36,.95);
+}
+.plot-filter-stack:hover .plot-filter-stack-menu,
+.plot-filter-stack:focus .plot-filter-stack-menu,
+.plot-filter-stack:focus-within .plot-filter-stack-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.plot-filter-stack:hover .plot-filter-stack-top,
+.plot-filter-stack:focus .plot-filter-stack-top,
+.plot-filter-stack:focus-within .plot-filter-stack-top { opacity: .45; }
+.plot-filter-stack:hover .plot-filter-stack-second,
+.plot-filter-stack:focus .plot-filter-stack-second,
+.plot-filter-stack:focus-within .plot-filter-stack-second { opacity: .18; }
+.plot-filter-stack-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 34px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.plot-filter-stack-item-label {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity .14s ease;
+}
+.plot-filter-stack-item-remove {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.84);
+  color: var(--text-primary);
+  opacity: 0;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity .14s ease;
+}
+[data-theme="dark"] .plot-filter-stack-item-remove {
+  background: rgba(26,30,36,.86);
+}
+.plot-filter-stack-item:hover .plot-filter-stack-item-remove,
+.plot-filter-stack-item:focus-visible .plot-filter-stack-item-remove { opacity: 1; }
+.plot-filter-stack-item:hover .plot-filter-stack-item-label,
+.plot-filter-stack-item:focus-visible .plot-filter-stack-item-label { opacity: .18; }
+
+.chart-export-control {
+  position: absolute;
+  right: 28px;
+  bottom: 27px;
+  z-index: 40;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease, visibility .15s ease;
+}
+.plotly-chart:hover + .chart-export-control,
+.chart-export-control:hover,
+.chart-export-control:focus-within,
+.chart-export-control.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.chart-export-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 31px;
+  padding: 7px 10px;
+  background: rgba(255,255,255,.88);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.10);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+  backdrop-filter: blur(5px);
+}
+[data-theme="dark"] .chart-export-button { background: rgba(26,30,36,.88); }
+.chart-export-button:hover,
+.chart-export-button:focus-visible,
+.chart-export-control.open .chart-export-button {
+  background: var(--panel-hover);
+  color: var(--text-primary);
+}
+.chart-export-icon { font-size: 14px; line-height: 1; }
+.chart-export-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  display: flex;
+  flex-direction: column;
+  min-width: 128px;
+  padding: 6px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.16);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  pointer-events: none;
+  transition: opacity .14s ease, transform .14s ease, visibility .14s ease;
+}
+[data-theme="dark"] .chart-export-menu { background: rgba(26,30,36,.97); }
+.chart-export-control.open .chart-export-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.chart-export-option {
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 0;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+}
+.chart-export-option:hover,
+.chart-export-option:focus-visible {
+  background: var(--panel-hover);
+  color: var(--text-primary);
+}
+
+.table-card {
+  margin-top: 20px;
+  padding: 20px;
+}
+.table-heading { margin-bottom: 14px; }
+.table-count {
+  color: var(--text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+thead { background: var(--table-header); }
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  color: var(--text-secondary);
+  font-weight: 650;
+}
+.sort-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.sort-button:hover { color: var(--navy); }
+.sort-indicator {
+  margin-left: 4px;
+  color: var(--text-muted);
+}
+.footer {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Wide layout: filters at left. */
+@media (min-width: 1180px) {
+  .filters-sidebar {
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .filters-sidebar.filters-anchored {
+    position: sticky;
+    top: 18px;
+    align-self: start;
+    max-height: calc(100vh - 36px);
+    overflow: auto;
+    z-index: 30;
+  }
+}
+
+/* Filters move above dashboard and dropdowns become a grid. */
+@media (max-width: 1179px) {
+  .page-shell { grid-template-columns: 1fr; }
+  .filters-sidebar {
+    position: static;
+    width: min(100%, 1100px);
+    margin-inline: auto;
+    max-height: none;
+    overflow: visible;
+  }
+  .filter-panel { display: block; }
+  #filterControls {
+    grid-template-columns: repeat(auto-fit, minmax(min(180px,100%),1fr));
+    gap: 14px;
+  }
+  .filters-sidebar.filters-anchored {
+    position: sticky;
+    top: 12px;
+    align-self: start;
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+    z-index: 50;
+  }
+  .filters-sidebar.filters-anchored .filter-panel {
+    box-shadow: 0 10px 28px rgba(0,0,0,.10);
+  }
+}
+
+@media (max-width: 950px) {
+  .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .chart-full { grid-column: auto; }
+}
+
+@media (max-width: 700px) {
+  .hero-top {
+    flex-direction: column;
+    padding: 32px clamp(16px,5vw,24px) 20px;
+  }
+  .tab-nav { padding-inline: clamp(16px,5vw,24px); }
+  .page-shell { padding: 16px clamp(14px,4vw,22px); }
+  .filters-sidebar { width: min(100%,680px); }
+  .filter-panel { padding: 16px; }
+  #filterControls {
+    grid-template-columns: repeat(auto-fit,minmax(min(145px,100%),1fr));
+    gap: 12px;
+  }
+  .filters-sidebar.filters-anchored {
+    top: 8px;
+    max-height: calc(100vh - 16px);
+  }
+  .active-filter-action-label,
+  .active-filter-action-remove { white-space: normal; }
+  .metrics {
+    grid-template-columns: repeat(auto-fit,minmax(min(145px,100%),1fr));
+    gap: 10px;
+  }
+  .metric-card { padding: 14px; }
+  .metric-value {
+    margin-top: 5px;
+    font-size: clamp(23px,7vw,28px);
+  }
+  .dashboard-intro {
+    width: min(100%,760px);
+    margin-inline: auto;
+    margin-bottom: 16px;
+  }
+  .dashboard-intro p:last-child { max-width: 68ch; }
+  .hover-status {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .dashboard-grid { gap: 14px; }
+  .chart-card,
+  .table-card { padding: clamp(14px,4vw,18px); }
+  .chart-heading,
+  .table-heading {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .chart-heading > :first-child,
+  .table-heading > :first-child {
+    min-width: 0;
+    flex: 1 1 260px;
+  }
+  .chart-heading p,
+  .table-heading p { max-width: 68ch; }
+  .plot-actions {
+    width: auto;
+    max-width: 100%;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+  .plot-filter-stack {
+    width: min(220px,100%);
+    min-width: min(150px,100%);
+  }
+  .plot-filter-stack-menu {
+    left: auto;
+    right: 0;
+    width: max-content;
+    min-width: 100%;
+    max-width: min(320px,calc(100vw - 28px));
+  }
+  .plot-filter-stack-item-label { white-space: normal; }
+  .table-card { margin-top: 14px; }
+  .table-count { width: fit-content; }
+  .plotly-chart,
+  .large-chart,
+  .heatmap-chart { height: clamp(300px,82vw,340px); }
+  .chart-export-control {
+    right: 22px;
+    bottom: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-shell { padding: 12px 14px; }
+  .filter-panel { padding: 14px; }
+  .metrics {
+    grid-template-columns: repeat(auto-fit,minmax(min(135px,100%),1fr));
+  }
+  .metric-card { padding: 12px; }
+  .chart-card,
+  .table-card { padding: 14px; }
+  .chart-heading,
+  .table-heading {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .plot-actions {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+  .plot-filter-stack { width: min(220px,100%); }
+  .plot-filter-stack-menu {
+    left: 0;
+    right: auto;
+    max-width: calc(100vw - 28px);
+  }
+}
+
+@media (max-width: 420px) {
+  #filterControls { grid-template-columns: 1fr; }
 }
