@@ -6,6 +6,27 @@
   <title>School of Applied Science</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    /* Active Filters & Actions reuse the same removable-filter overlay as plot menus. */
+    .active-filter-list .plot-filter-stack-item {
+      width: auto;
+      min-height: 30px;
+      border-radius: 999px;
+      background: var(--blue-light);
+      color: var(--navy);
+    }
+
+    .active-filter-list .plot-filter-stack-item-label {
+      min-height: 30px;
+      padding: 5px 8px;
+      white-space: normal;
+    }
+
+    .active-filter-list .plot-filter-stack-item-remove {
+      border-radius: inherit;
+      white-space: nowrap;
+    }
+  </style>
 </head>
 <body>
 <header class="hero">
@@ -127,5 +148,99 @@
 
 <footer class="footer">All data are simulated for demonstration purposes only.</footer>
 <script src="js/dashboard.js"></script>
+<script>
+  clearAppliedFilter = function(filter) {
+    if (filter.kind === 'dropdown') {
+      dropdownState[filter.source] = 'all';
+      removeFilterFromRecency('dropdown', filter.source);
+
+      const select = document.getElementById(`filter-${filter.source}`);
+      if (select) select.value = 'all';
+    } else if (filter.kind === 'plot') {
+      const sourceFilters = plotFilters[filter.source];
+
+      if (
+        filter.field &&
+        sourceFilters &&
+        Object.prototype.hasOwnProperty.call(sourceFilters, filter.field)
+      ) {
+        delete sourceFilters[filter.field];
+
+        if (Object.keys(sourceFilters).length === 0) {
+          removeFilterFromRecency('plot', filter.source);
+        }
+      } else {
+        plotFilters[filter.source] = {};
+        removeFilterFromRecency('plot', filter.source);
+      }
+    }
+
+    renderDashboard();
+  };
+
+  renderActive = function() {
+    const container = document.getElementById('activeFilters');
+    container.innerHTML = '';
+
+    let count = 0;
+
+    function addRemovableFilter({ kind, source, field = null, label }) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'plot-filter-stack-item';
+      item.setAttribute('aria-label', `Remove filter ${label}`);
+
+      const labelElement = document.createElement('span');
+      labelElement.className = 'plot-filter-stack-item-label';
+      labelElement.textContent = label;
+
+      const removeOverlay = document.createElement('span');
+      removeOverlay.className = 'plot-filter-stack-item-remove';
+      removeOverlay.textContent = 'Remove filter';
+
+      item.append(labelElement, removeOverlay);
+
+      item.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        clearAppliedFilter({ kind, source, field });
+      });
+
+      container.appendChild(item);
+      count++;
+    }
+
+    Object.entries(dropdownState).forEach(([field, value]) => {
+      if (value === 'all') return;
+
+      addRemovableFilter({
+        kind: 'dropdown',
+        source: field,
+        field,
+        label: `${field}: ${value}`
+      });
+    });
+
+    Object.entries(plotFilters).forEach(([source, filters]) => {
+      Object.entries(filters).forEach(([field, value]) => {
+        addRemovableFilter({
+          kind: 'plot',
+          source,
+          field,
+          label: `${source}: ${field === 'ids' ? `${value.length} selected` : value}`
+        });
+      });
+    });
+
+    if (count === 0) {
+      const empty = document.createElement('span');
+      empty.className = 'no-filter';
+      empty.textContent = 'No filters applied';
+      container.appendChild(empty);
+    }
+  };
+
+  renderActive();
+</script>
 </body>
 </html>
