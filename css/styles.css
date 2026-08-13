@@ -856,3 +856,520 @@
   }
 
 }
+
+
+/* =========================================================
+   RECENCY-ORDERED STACKED FILTER CARDS
+   ========================================================= */
+
+.plot-actions {
+  position:
+    relative;
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    flex-end;
+
+  min-width:
+    0;
+
+  max-width:
+    360px;
+
+  /*
+    Leave room for the second card sliver.
+  */
+  padding-bottom:
+    7px;
+}
+
+.plot-filter-stack {
+  position:
+    relative;
+
+  width:
+    220px;
+
+  max-width:
+    100%;
+
+  min-height:
+    38px;
+
+  outline:
+    none;
+}
+
+
+/* Most recently applied filter */
+
+.plot-filter-stack-top {
+  position:
+    relative;
+
+  z-index:
+    5;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  min-height:
+    31px;
+
+  padding:
+    7px
+    11px;
+
+  overflow:
+    hidden;
+
+  background:
+    var(--panel-secondary);
+
+  color:
+    var(--text-secondary);
+
+  border:
+    1px solid
+    var(--border-strong);
+
+  border-radius:
+    8px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    600;
+
+  line-height:
+    1.2;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  box-shadow:
+    0
+    1px
+    2px
+    rgba(
+      0,
+      0,
+      0,
+      .04
+    );
+}
+
+
+/* Second-most-recent filter peeks out beneath the top card */
+
+.plot-filter-stack-second {
+  position:
+    absolute;
+
+  top:
+    6px;
+
+  left:
+    7px;
+
+  right:
+    7px;
+
+  z-index:
+    4;
+
+  height:
+    31px;
+
+  padding:
+    7px
+    10px;
+
+  overflow:
+    hidden;
+
+  background:
+    var(--panel-hover);
+
+  color:
+    var(--text-muted);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    8px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    600;
+
+  line-height:
+    1.2;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  transform:
+    translateY(
+      7px
+    );
+
+  pointer-events:
+    none;
+}
+
+
+/* Expanded filter list */
+
+.plot-filter-stack-menu {
+  position:
+    absolute;
+
+  top:
+    calc(
+      100% +
+      5px
+    );
+
+  right:
+    0;
+
+  z-index:
+    20;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    5px;
+
+  width:
+    100%;
+
+  min-width:
+    220px;
+
+  padding:
+    8px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .94
+    );
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    10px;
+
+  box-shadow:
+    0
+    12px
+    30px
+    rgba(
+      0,
+      0,
+      0,
+      .16
+    );
+
+  opacity:
+    0;
+
+  visibility:
+    hidden;
+
+  transform:
+    translateY(
+      -7px
+    );
+
+  pointer-events:
+    none;
+
+  transition:
+    opacity .16s ease,
+    visibility .16s ease,
+    transform .16s ease;
+}
+
+[data-theme="dark"]
+.plot-filter-stack-menu {
+  background:
+    rgba(
+      26,
+      30,
+      36,
+      .95
+    );
+}
+
+.plot-filter-stack:hover
+.plot-filter-stack-menu,
+.plot-filter-stack:focus
+.plot-filter-stack-menu,
+.plot-filter-stack:focus-within
+.plot-filter-stack-menu {
+  opacity:
+    1;
+
+  visibility:
+    visible;
+
+  transform:
+    translateY(
+      0
+    );
+
+  pointer-events:
+    auto;
+}
+
+
+/*
+  Fade the collapsed stack while the full list is open so the
+  expanded list visually becomes the focus.
+*/
+
+.plot-filter-stack:hover
+.plot-filter-stack-top,
+.plot-filter-stack:focus
+.plot-filter-stack-top,
+.plot-filter-stack:focus-within
+.plot-filter-stack-top {
+  opacity:
+    .45;
+}
+
+.plot-filter-stack:hover
+.plot-filter-stack-second,
+.plot-filter-stack:focus
+.plot-filter-stack-second,
+.plot-filter-stack:focus-within
+.plot-filter-stack-second {
+  opacity:
+    .18;
+}
+
+
+/* Individual filters in expanded list */
+
+.plot-filter-stack-item {
+  position:
+    relative;
+
+  display:
+    block;
+
+  width:
+    100%;
+
+  min-height:
+    34px;
+
+  padding:
+    0;
+
+  overflow:
+    hidden;
+
+  background:
+    var(--panel-secondary);
+
+  color:
+    var(--text-secondary);
+
+  border:
+    1px solid
+    var(--border-strong);
+
+  border-radius:
+    7px;
+
+  font:
+    inherit;
+
+  font-size:
+    12px;
+
+  font-weight:
+    600;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+}
+
+.plot-filter-stack-item-label {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  min-height:
+    34px;
+
+  padding:
+    8px
+    10px;
+
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+  transition:
+    opacity .14s ease;
+}
+
+.plot-filter-stack-item-remove {
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .84
+    );
+
+  color:
+    var(--text-primary);
+
+  opacity:
+    0;
+
+  text-align:
+    center;
+
+  pointer-events:
+    none;
+
+  transition:
+    opacity .14s ease;
+}
+
+[data-theme="dark"]
+.plot-filter-stack-item-remove {
+  background:
+    rgba(
+      26,
+      30,
+      36,
+      .86
+    );
+}
+
+.plot-filter-stack-item:hover
+.plot-filter-stack-item-remove,
+.plot-filter-stack-item:focus-visible
+.plot-filter-stack-item-remove {
+  opacity:
+    1;
+}
+
+.plot-filter-stack-item:hover
+.plot-filter-stack-item-label,
+.plot-filter-stack-item:focus-visible
+.plot-filter-stack-item-label {
+  opacity:
+    .18;
+}
+
+
+/*
+  Hide structures from earlier stacked-filter implementations.
+*/
+
+.plot-filter-stack-summary,
+.plot-filter-stack-summary-text,
+.plot-filter-stack-chevron,
+.plot-filter-chip,
+.plot-filter-chip-close,
+.plot-filter-chip-overlay,
+.plot-reset {
+  display:
+    none !important;
+}
+
+
+@media (max-width: 900px) {
+
+  .plot-actions {
+    width:
+      100%;
+
+    max-width:
+      100%;
+
+    justify-content:
+      flex-start;
+  }
+
+  .plot-filter-stack {
+    width:
+      min(
+        100%,
+        320px
+      );
+  }
+
+  .plot-filter-stack-menu {
+    left:
+      0;
+
+    right:
+      auto;
+
+    width:
+      100%;
+  }
+
+}
