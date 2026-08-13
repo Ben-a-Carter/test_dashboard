@@ -1578,3 +1578,108 @@
   pointer-events:
     none;
 }
+
+
+/* =========================================================
+   OPTIONAL FILTER SIDEBAR ANCHOR
+   ========================================================= */
+
+.filter-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.anchor-filters-toggle {
+  display: none;
+  align-items: center;
+  gap: 6px;
+
+  min-height: 31px;
+  padding: 7px 10px;
+
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
+
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.anchor-filters-toggle:hover {
+  background: var(--panel-hover);
+  color: var(--text-primary);
+}
+
+.anchor-filters-toggle[aria-pressed="true"] {
+  background: var(--blue-light);
+  color: var(--navy);
+  border-color: var(--border-strong);
+}
+
+.anchor-filter-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/*
+  Override the original wide-screen sticky rule.
+
+  Scroll-with-page is now the default.
+*/
+@media (min-width: 1180px) {
+
+  .anchor-filters-toggle {
+    display: inline-flex;
+  }
+
+  .filters-sidebar {
+    position: static !important;
+    top: auto !important;
+    align-self: start;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /*
+    Sticky positioning is enabled only after the user
+    explicitly activates Anchor filters.
+  */
+  .filters-sidebar.filters-anchored {
+    position: sticky !important;
+    top: 18px !important;
+    align-self: start;
+    max-height: calc(100vh - 36px) !important;
+    overflow: auto !important;
+  }
+
+}
+
+@media (max-width: 1179px) {
+
+  .anchor-filters-toggle {
+    display: none !important;
+  }
+
+}
+
+@media (max-width: 700px) {
+
+  .filter-heading-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+}
