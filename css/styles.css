@@ -795,13 +795,14 @@ th {
      *   Controls how far the shadow begins outside the box.
      *   Increase for a larger halo around the panel.
      *
-     * --filter-shadow-strength
-     *   Controls the opacity of the shadow gradient.
-     *   Increase toward 1 for a stronger/darker shadow.
+     * --filter-shadow-color
+     *   Controls the shadow color. It uses var(--page-bg),
+     *   so light mode is white and dark mode matches the
+     *   dashboard's dark page background automatically.
      */
-    --filter-shadow-blur: 12px;
-    --filter-shadow-spread: 7px;
-    --filter-shadow-strength: .95;
+    --filter-shadow-blur: 24px;
+    --filter-shadow-spread: 5px;
+    --filter-shadow-color: var(--page-bg);
 
     position: sticky;
     top: 18px;
@@ -815,11 +816,7 @@ th {
       0 0
       var(--filter-shadow-blur)
       var(--filter-shadow-spread)
-      rgba(0,0,0,var(--filter-shadow-strength));
-  }
-
-  [data-theme="dark"] .filters-sidebar.filters-anchored {
-    --filter-shadow-strength: .48;
+      var(--filter-shadow-color);
   }
 }
 
