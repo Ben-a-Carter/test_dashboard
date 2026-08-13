@@ -1,4 +1,25 @@
-student_id,year,department,program,student_type,gender,age,gpa,credits,retained,graduated,risk_level,financial_aid
-S0001,2024,Public Health,MPH,Graduate,Female,27,3.72,24,Yes,No,Low,Yes
-S0002,2024,Social Work,MSW,Graduate,Male,31,3.15,18,Yes,No,Medium,Yes
-S0003,2025,Nutrition,BS Nutrition,Undergraduate,Female,21,2.61,54,No,No,High,Yes
+student_id,year,department,program,student_type,gender,age,gpa,credits_attempted,credits_completed,attendance_rate,advising_visits,financial_aid,first_generation,risk_level,retained
+S0001,2023,Public Health,BS Public Health,Undergraduate,Female,20,3.62,30,29,92,3,Yes,Yes,Low,Yes
+S0002,2023,Public Health,MPH,Graduate,Male,28,3.41,24,24,89,2,Yes,No,Low,Yes
+S0003,2023,Social Work,BSW,Undergraduate,Female,21,2.81,30,24,76,1,Yes,Yes,Medium,Yes
+S0004,2023,Social Work,MSW,Graduate,Female,31,3.76,21,21,94,4,No,No,Low,Yes
+S0005,2023,Nutrition,BS Nutrition,Undergraduate,Male,20,2.22,30,19,68,0,Yes,Yes,High,No
+S0006,2023,Nutrition,MS Nutrition,Graduate,Female,27,3.55,24,23,90,2,No,No,Low,Yes
+S0007,2024,Public Health,BS Public Health,Undergraduate,Male,22,2.93,31,27,81,2,Yes,Yes,Medium,Yes
+S0008,2024,Public Health,MPH,Graduate,Female,29,3.82,24,24,95,5,Yes,No,Low,Yes
+S0009,2024,Social Work,BSW,Undergraduate,Female,20,3.17,30,28,86,3,Yes,Yes,Low,Yes
+S0010,2024,Social Work,MSW,Graduate,Male,32,2.64,21,17,72,1,Yes,No,Medium,No
+S0011,2024,Nutrition,BS Nutrition,Undergraduate,Female,21,2.38,30,20,70,0,Yes,Yes,High,No
+S0012,2024,Nutrition,MS Nutrition,Graduate,Female,26,3.68,24,24,93,4,No,No,Low,Yes
+S0013,2025,Public Health,BS Public Health,Undergraduate,Female,19,3.33,30,29,88,2,Yes,Yes,Low,Yes
+S0014,2025,Public Health,MPH,Graduate,Male,30,3.11,24,22,84,2,No,No,Medium,Yes
+S0015,2025,Social Work,BSW,Undergraduate,Male,22,2.52,30,22,73,1,Yes,Yes,High,No
+S0016,2025,Social Work,MSW,Graduate,Female,28,3.91,21,21,97,5,Yes,No,Low,Yes
+S0017,2025,Nutrition,BS Nutrition,Undergraduate,Female,20,3.08,30,27,82,2,Yes,Yes,Medium,Yes
+S0018,2025,Nutrition,MS Nutrition,Graduate,Male,29,3.47,24,23,89,3,No,No,Low,Yes
+S0019,2026,Public Health,BS Public Health,Undergraduate,Male,21,2.31,30,19,66,0,Yes,Yes,High,No
+S0020,2026,Public Health,MPH,Graduate,Female,27,3.71,24,24,92,4,Yes,No,Low,Yes
+S0021,2026,Social Work,BSW,Undergraduate,Female,22,3.29,30,28,87,3,Yes,Yes,Low,Yes
+S0022,2026,Social Work,MSW,Graduate,Male,33,2.74,21,18,75,1,No,No,Medium,Yes
+S0023,2026,Nutrition,BS Nutrition,Undergraduate,Female,20,2.18,30,18,64,0,Yes,Yes,High,No
+S0024,2026,Nutrition,MS Nutrition,Graduate,Female,30,3.84,24,24,96,5,No,No,Low,Yes
