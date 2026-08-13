@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Interactive Analytics Dashboard</title>
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+
+<body>
+
+<header class="hero">
+  <h1>Interactive Analytics Dashboard</h1>
+  <p>Explore enrollment and retention outcomes</p>
+</header>
+
+<main class="container">
+
+  <section class="filters">
+
+    <label>
+      Year
+      <select id="yearFilter">
+        <option value="all">All years</option>
+      </select>
+    </label>
+
+    <label>
+      Department
+      <select id="departmentFilter">
+        <option value="all">All departments</option>
+      </select>
+    </label>
+
+  </section>
+
+
+  <section class="metrics">
+
+    <div class="metric-card">
+      <div class="metric-label">Enrollment</div>
+      <div id="totalEnrollment" class="metric-value">—</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">Average retention</div>
+      <div id="avgRetention" class="metric-value">—</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">Students at risk</div>
+      <div id="totalRisk" class="metric-value">—</div>
+    </div>
+
+  </section>
+
+
+  <section class="chart-card">
+    <h2>Enrollment</h2>
+
+    <div class="chart-container">
+      <canvas id="enrollmentChart"></canvas>
+    </div>
+  </section>
+
+
+  <section class="chart-card">
+    <h2>Retention</h2>
+
+    <div class="chart-container">
+      <canvas id="retentionChart"></canvas>
+    </div>
+  </section>
+
+</main>
+
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>
