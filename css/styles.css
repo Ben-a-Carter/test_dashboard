@@ -792,7 +792,10 @@ th {
     z-index: 50;
   }
   .filters-sidebar.filters-anchored .filter-panel {
-    box-shadow: 0 10px 28px rgba(0,0,0,.10);
+    box-shadow:
+      0 0 0 2px var(--page-bg),
+      0 0 22px 7px var(--page-bg),
+      0 10px 28px rgba(0,0,0,.10);
   }
 }
 
