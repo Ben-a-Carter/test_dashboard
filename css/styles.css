@@ -800,8 +800,8 @@ th {
      *   Increase toward 1 for a stronger/darker shadow.
      */
     --filter-shadow-blur: 24px;
-    --filter-shadow-spread: 5px;
-    --filter-shadow-strength: .20;
+    --filter-shadow-spread: 7px;
+    --filter-shadow-strength: .80;
 
     position: sticky;
     top: 18px;
