@@ -19,9 +19,9 @@ function initTheme(){themeState.mode='system';localStorage.removeItem('analytics
 function resetState(){Object.keys(dropdownState).forEach(k=>delete dropdownState[k]);['trend','category','status','scatter','heatmap','distribution','flow'].forEach(k=>plotFilters[k]={});tableState.sortField='id';tableState.sortDirection='asc'}function applyDropdowns(d){return d.filter(r=>Object.entries(dropdownState).every(([f,v])=>v==='all'||String(r[f])===String(v)))}function applyPlots(d,exclude=null){return d.filter(r=>{for(const[source,filters]of Object.entries(plotFilters)){if(source===exclude)continue;for(const[f,v]of Object.entries(filters)){if(f==='ids'){if(!v.includes(r.id))return false}else if(String(r[f])!==String(v))return false}}return true})}function dataFor(source=null){return applyPlots(applyDropdowns(activeData),source)}
 function switchTab(key){activeTab=key;activeData=configs[key].data;resetState();buildUI();renderDashboard();document.querySelectorAll('.tab-button').forEach(b=>b.classList.toggle('active',b.dataset.tab===key))}
 function buildUI(){const c=configs[activeTab];document.getElementById('filterTitle').textContent=c.title;document.getElementById('dashboardKicker').textContent=c.title;document.getElementById('dashboardTitle').textContent=c.title;document.getElementById('dashboardDescription').textContent=c.description;const fc=document.getElementById('filterControls');fc.innerHTML='';c.filters.forEach(([f,label])=>{dropdownState[f]='all';const g=document.createElement('div');g.className='filter-group';const l=document.createElement('label');l.htmlFor=`filter-${f}`;l.textContent=label;const s=document.createElement('select');s.id=`filter-${f}`;const a=document.createElement('option');a.value='all';a.textContent=`All ${label.toLowerCase()}`;s.appendChild(a);uniq(activeData,f).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)});s.addEventListener('change',e=>{dropdownState[f]=e.target.value;renderDashboard()});g.append(l,s);fc.appendChild(g)});[['trend','trendTitle','trendHelp'],['category','categoryTitle','categoryHelp'],['status','statusTitle','statusHelp'],['scatter','scatterTitle','scatterHelp'],['heatmap','heatmapTitle','heatmapHelp'],['distribution','distributionTitle','distributionHelp'],['flow','flowTitle','flowHelp']].forEach(([k,t,h])=>{document.getElementById(t).textContent=c[k].title;document.getElementById(h).textContent=c[k].help});document.getElementById('tableTitle').textContent=`${c.title} records`}
-function renderDashboard(){filteredData=dataFor();renderMetrics();renderActive();renderResets();updatePlotFilterLabels();renderTrend();renderCategory();renderStatus();renderScatter();renderHeatmap();renderDistribution();renderFlow();renderTable()}
+function renderDashboard(){filteredData=dataFor();renderMetrics();renderActive();renderResets();renderTrend();renderCategory();renderStatus();renderScatter();renderHeatmap();renderDistribution();renderFlow();renderTable()}
 function renderMetrics(){const m=document.getElementById('metrics');m.innerHTML='';configs[activeTab].metrics.forEach(([l,fn])=>{const c=document.createElement('article');c.className='metric-card';c.innerHTML=`<div class="metric-label">${l}</div><div class="metric-value">${fn(filteredData)}</div>`;m.appendChild(c)})}function renderActive(){const c=document.getElementById('activeFilters');c.innerHTML='';let n=0;const chip=t=>{const s=document.createElement('span');s.className='filter-chip';s.textContent=t;c.appendChild(s);n++};Object.entries(dropdownState).forEach(([f,v])=>{if(v!=='all')chip(`${f}: ${v}`)});Object.entries(plotFilters).forEach(([src,fs])=>Object.entries(fs).forEach(([f,v])=>chip(`${src}: ${f==='ids'?`${v.length} selected`:v}`)));if(!n){const s=document.createElement('span');s.className='no-filter';s.textContent='No filters applied';c.appendChild(s)}}
-function formatPlotFilterValue(
+function formatFilterPart(
   field,
   value
 ) {
@@ -40,15 +40,16 @@ function formatPlotFilterValue(
 }
 
 
-function getEffectiveFilterEntries() {
+function getFiltersAffectingPlot(
+  targetSource
+) {
 
-  const entries =
+  const filters =
     [];
 
 
   /*
-    Dashboard dropdown filters affect every visualization,
-    so include all active dropdown selections.
+    Dropdown filters apply to every plot.
   */
 
   Object.entries(
@@ -66,14 +67,19 @@ function getEffectiveFilterEntries() {
         value !== "all"
       ) {
 
-        entries.push({
+        filters.push({
+
+          kind:
+            "dropdown",
 
           source:
-            "Dashboard",
+            field,
 
-          field,
-
-          value
+          label:
+            formatFilterPart(
+              field,
+              value
+            )
 
         });
 
@@ -84,12 +90,12 @@ function getEffectiveFilterEntries() {
 
 
   /*
-    Chart actions also affect the coordinated dashboard.
+    A plot's own action is deliberately excluded from that
+    plot's data in getDataForView(source), so its chip should
+    also be excluded from that plot header.
 
-    We intentionally include every active chart action in the
-    label shown beside every plot. This gives users a consistent
-    view of the current dashboard context regardless of which
-    visualization originally created the filter.
+    Every OTHER plot action is affecting this plot and should
+    therefore be shown here.
   */
 
   Object.entries(
@@ -99,200 +105,13 @@ function getEffectiveFilterEntries() {
     (
       [
         source,
-        filters
+        sourceFilters
       ]
     ) => {
 
-      Object.entries(
-        filters
-      )
-      .forEach(
-        (
-          [
-            field,
-            value
-          ]
-        ) => {
-
-          entries.push({
-
-            source:
-              prettify(
-                source
-              ),
-
-            field,
-
-            value
-
-          });
-
-        }
-      );
-
-    }
-  );
-
-
-  return entries;
-
-}
-
-
-function getGlobalPlotFilterLabel() {
-
-  const entries =
-    getEffectiveFilterEntries();
-
-
-  if (
-    entries.length ===
-    0
-  ) {
-
-    return "No active filters";
-
-  }
-
-
-  const formatted =
-    entries.map(
-      entry => {
-
-        if (
-          entry.field ===
-          "ids"
-        ) {
-
-          return `${entry.value.length.toLocaleString()} selected records`;
-
-        }
-
-
-        return `${prettify(
-          entry.field
-        )}: ${entry.value}`;
-
-      }
-    );
-
-
-  /*
-    Keep the label readable when many filters are active.
-    Show the first two filters and summarize any remainder.
-  */
-
-  if (
-    formatted.length <=
-    2
-  ) {
-
-    return `Filtered by ${formatted.join(" + ")}`;
-
-  }
-
-
-  return (
-
-    `Filtered by ${formatted
-      .slice(
-        0,
-        2
-      )
-      .join(" + ")}` +
-
-    ` + ${formatted.length - 2} more`
-
-  );
-
-}
-
-
-function updatePlotFilterLabels() {
-
-  const text =
-    getGlobalPlotFilterLabel();
-
-
-  const active =
-    text !==
-    "No active filters";
-
-
-  document
-    .querySelectorAll(
-      "[data-filter-label]"
-    )
-    .forEach(
-      label => {
-
-        label.textContent =
-          text;
-
-
-        label.classList.toggle(
-          "active",
-          active
-        );
-
-
-        label.title =
-          active
-
-            ? getEffectiveFilterEntries()
-                .map(
-                  entry =>
-
-                    entry.field ===
-                    "ids"
-
-                      ? `${entry.source}: ${entry.value.length.toLocaleString()} selected records`
-
-                      : `${entry.source}: ${prettify(entry.field)} = ${entry.value}`
-
-                )
-                .join(" | ")
-
-            : "No active filters";
-
-      }
-    );
-
-
-  /*
-    Backward-compatible support for the earlier element IDs.
-  */
-
-  const legacyIds = [
-
-    "trendFilterLabel",
-
-    "departmentFilterLabel",
-
-    "riskFilterLabel",
-
-    "scatterFilterLabel",
-
-    "heatmapFilterLabel",
-
-    "boxFilterLabel",
-
-    "sankeyFilterLabel"
-
-  ];
-
-
-  legacyIds.forEach(
-    elementId => {
-
-      const label =
-        document.getElementById(
-          elementId
-        );
-
-
       if (
-        !label
+        source ===
+        targetSource
       ) {
 
         return;
@@ -300,22 +119,261 @@ function updatePlotFilterLabels() {
       }
 
 
-      label.textContent =
-        text;
+      const entries =
+        Object.entries(
+          sourceFilters
+        );
 
 
-      label.classList.toggle(
-        "active",
-        active
-      );
+      if (
+        entries.length ===
+        0
+      ) {
+
+        return;
+
+      }
+
+
+      filters.push({
+
+        kind:
+          "plot",
+
+        source,
+
+        label:
+          entries
+            .map(
+              (
+                [
+                  field,
+                  value
+                ]
+              ) =>
+                formatFilterPart(
+                  field,
+                  value
+                )
+            )
+            .join(
+              " + "
+            )
+
+      });
 
     }
   );
 
+
+  return filters;
+
 }
 
 
-function renderResets(){document.querySelectorAll('.plot-reset').forEach(b=>b.disabled=!Object.keys(plotFilters[b.dataset.reset]||{}).length);updatePlotFilterLabels()}
+function clearAppliedFilter(
+  filter
+) {
+
+  if (
+    filter.kind ===
+    "dropdown"
+  ) {
+
+    dropdownState[
+      filter.source
+    ] =
+      "all";
+
+
+    const select =
+      document.getElementById(
+        `filter-${filter.source}`
+      );
+
+
+    if (
+      select
+    ) {
+
+      select.value =
+        "all";
+
+    }
+
+  }
+
+  else if (
+    filter.kind ===
+    "plot"
+  ) {
+
+    /*
+      Clear the entire originating plot action.
+
+      This preserves the previous "Reset this plot" semantics.
+      Example:
+      a heatmap action containing Department + Year is removed
+      as one action.
+    */
+
+    plotFilters[
+      filter.source
+    ] =
+      {};
+
+  }
+
+
+  renderDashboard();
+
+}
+
+
+function renderPlotFilterChips() {
+
+  document
+    .querySelectorAll(
+      "[data-filter-chips]"
+    )
+    .forEach(
+      container => {
+
+        const targetSource =
+          container.dataset.filterChips;
+
+
+        const filters =
+          getFiltersAffectingPlot(
+            targetSource
+          );
+
+
+        container.innerHTML =
+          "";
+
+
+        if (
+          filters.length ===
+          0
+        ) {
+
+          const empty =
+            document.createElement(
+              "span"
+            );
+
+
+          empty.className =
+            "plot-filter-empty";
+
+
+          empty.textContent =
+            "No active filters";
+
+
+          container.appendChild(
+            empty
+          );
+
+
+          return;
+
+        }
+
+
+        filters.forEach(
+          filter => {
+
+            const chip =
+              document.createElement(
+                "span"
+              );
+
+
+            chip.className =
+              "plot-filter-chip";
+
+
+            const text =
+              document.createElement(
+                "span"
+              );
+
+
+            text.className =
+              "plot-filter-chip-text";
+
+
+            text.textContent =
+              filter.label;
+
+
+            const close =
+              document.createElement(
+                "button"
+              );
+
+
+            close.type =
+              "button";
+
+
+            close.className =
+              "plot-filter-chip-close";
+
+
+            close.setAttribute(
+              "aria-label",
+              `Remove filter ${filter.label}`
+            );
+
+
+            close.title =
+              `Remove ${filter.label}`;
+
+
+            close.textContent =
+              "×";
+
+
+            close.addEventListener(
+              "click",
+              event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+
+                clearAppliedFilter(
+                  filter
+                );
+
+              }
+            );
+
+
+            chip.append(
+              text,
+              close
+            );
+
+
+            container.appendChild(
+              chip
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function renderResets(){renderPlotFilterChips()}
 function renderTrend(){const c=configs[activeTab].trend,d=dataFor('trend'),xs=uniq(d,c.x),bars=xs.map(x=>{const s=d.filter(r=>String(r[c.x])===String(x));return c.valueField?sum(s,c.valueField):s.length}),tr=[{x:xs,y:bars,type:'bar',name:c.valueField||'Count',marker:{color:colors.blue}}];if(c.lineNumeric)tr.push({x:xs,y:xs.map(x=>avgRaw(d.filter(r=>String(r[c.x])===String(x)),c.lineNumeric)),type:'scatter',mode:'lines+markers',name:c.lineNumeric,yaxis:'y2',line:{color:colors.green,width:3}});else if(c.lineField)tr.push({x:xs,y:xs.map(x=>{const s=d.filter(r=>String(r[c.x])===String(x));return s.length?s.filter(r=>String(r[c.lineField])===String(c.lineValue)).length/s.length*100:0}),type:'scatter',mode:'lines+markers',name:c.lineField,yaxis:'y2',line:{color:colors.green,width:3}});Plotly.react('trendChart',tr,themedLayout({margin:{t:15,r:65,b:55,l:60},xaxis:{title:c.x},yaxis:{title:c.valueField||'Count'},yaxis2:{overlaying:'y',side:'right',ticksuffix:c.lineField&&!c.lineNumeric?'%':''},legend:{orientation:'h',y:1.12}}),plotConfig).then(()=>attachCat('trendChart','trend',c.x,p=>p.x))}
 function renderCategory(){const c=configs[activeTab].category,d=dataFor('category'),cats=uniq(d,c.field),stacks=uniq(d,c.stack),tr=stacks.map((sv,i)=>({x:cats,y:cats.map(cat=>{const s=d.filter(r=>String(r[c.field])===String(cat)&&String(r[c.stack])===String(sv));return c.valueField?sum(s,c.valueField):s.length}),type:'bar',name:sv,marker:{color:[colors.blue,colors.navy,colors.purple,colors.green,colors.orange][i%5]}}));Plotly.react('categoryChart',tr,themedLayout({barmode:'stack',margin:{t:15,r:15,b:100,l:55},xaxis:{tickangle:-25},yaxis:{title:c.valueField||'Count'},legend:{orientation:'h',y:1.13}}),plotConfig).then(()=>attachCat('categoryChart','category',c.field,p=>p.x))}
 function renderStatus(){const c=configs[activeTab].status,d=dataFor('status'),labels=uniq(d,c.field),values=labels.map(v=>d.filter(r=>String(r[c.field])===String(v)).length);Plotly.react('statusChart',[{labels,values,type:'pie',hole:.58,textinfo:'percent'}],themedLayout({margin:{t:20,r:20,b:30,l:20},legend:{orientation:'h',y:-.1}}),plotConfig).then(()=>attachCat('statusChart','status',c.field,p=>p.label))}
@@ -326,4 +384,4 @@ function renderFlow(){const c=configs[activeTab].flow,d=dataFor('flow'),a=uniq(d
 function attachCat(id,source,field,getter){const p=document.getElementById(id);clearListeners(p);p.on('plotly_click',e=>{const pt=e.points?.[0];if(!pt)return;plotFilters[source]={[field]:getter(pt)};renderDashboard()});p.on('plotly_hover',e=>{const pt=e.points?.[0];if(!pt)return;const v=getter(pt);document.getElementById('hoverStatus').textContent=`Highlighting ${field}: ${v}`;highlightTable(field,v)});p.on('plotly_unhover',()=>{document.getElementById('hoverStatus').textContent='Hover over a categorical mark to highlight related records. Click it to filter the other views.';highlightTable(null,null)})}function clearListeners(p){if(!p?.removeAllListeners)return;['plotly_click','plotly_hover','plotly_unhover','plotly_selected'].forEach(n=>p.removeAllListeners(n))}
 function renderTable(){const h=document.getElementById('tableHeader'),tb=document.querySelector('#dataTable tbody');h.innerHTML='';tb.innerHTML='';const fields=Object.keys(activeData[0]||{});if(!tableState.sortField||!fields.includes(tableState.sortField))tableState.sortField=fields[0];fields.forEach(f=>{const th=document.createElement('th'),b=document.createElement('button');b.className='sort-button';b.type='button';b.textContent=prettify(f);if(tableState.sortField===f){const s=document.createElement('span');s.className='sort-indicator';s.textContent=tableState.sortDirection==='asc'?' ▲':' ▼';b.appendChild(s)}b.addEventListener('click',()=>{if(tableState.sortField===f)tableState.sortDirection=tableState.sortDirection==='asc'?'desc':'asc';else{tableState.sortField=f;tableState.sortDirection='asc'}renderTable()});th.appendChild(b);h.appendChild(th)});const sorted=[...filteredData].sort((a,b)=>compare(a[tableState.sortField],b[tableState.sortField],tableState.sortDirection)),shown=sorted.slice(0,250),ranges=numRanges(filteredData,fields);shown.forEach(row=>{const tr=document.createElement('tr');tr.dataset.recordId=row.id;fields.forEach(f=>{const td=document.createElement('td');td.textContent=formatVal(f,row[f]);if(ranges[f]&&Number.isFinite(Number(row[f])))td.style.background=numColor(Number(row[f]),ranges[f]);tr.appendChild(td)});tb.appendChild(tr)});document.getElementById('tableCount').textContent=`${shown.length.toLocaleString()} shown of ${filteredData.length.toLocaleString()}`}
 function compare(a,b,d){const f=d==='asc'?1:-1,an=Number(a),bn=Number(b);return Number.isFinite(an)&&Number.isFinite(bn)?(an-bn)*f:String(a??'').localeCompare(String(b??''))*f}function prettify(f){return f.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}function formatVal(f,v){if(v===null||v===undefined)return'';if(f.includes('propensity'))return`${(Number(v)*100).toFixed(1)}%`;if(/salary|budget|actual|amount|capacity|aid_offer|financial_need/.test(f))return`$${Math.round(Number(v)).toLocaleString()}`;if(typeof v==='number'&&!Number.isInteger(v))return v.toFixed(1);return String(v)}function numRanges(d,fields){const o={};fields.forEach(f=>{const v=d.map(r=>Number(r[f])).filter(Number.isFinite);if(v.length)o[f]={min:Math.min(...v),max:Math.max(...v)}});return o}function numColor(v,r){const t=clamp((v-r.min)/((r.max-r.min)||1),0,1),h=210-t*105;return getTheme()==='dark'?`hsl(${h} 38% ${18+t*7}%)`:`hsl(${h} 55% ${96-t*14}%)`}function highlightTable(f,v){document.querySelectorAll('#dataTable tbody tr').forEach(row=>{if(!f){row.style.opacity='1';return}const rec=filteredData.find(x=>x.id===row.dataset.recordId);if(rec)row.style.opacity=String(rec[f])===String(v)?'1':'.22'})}
-document.querySelectorAll('.tab-button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));document.getElementById('resetAll').addEventListener('click',()=>{resetState();buildUI();renderDashboard()});document.querySelectorAll('.plot-reset').forEach(b=>b.addEventListener('click',()=>{plotFilters[b.dataset.reset]={};renderDashboard()}));initTheme();switchTab('student');
+document.querySelectorAll('.tab-button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));document.getElementById('resetAll').addEventListener('click',()=>{resetState();buildUI();renderDashboard()});initTheme();switchTab('student');
