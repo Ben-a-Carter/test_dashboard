@@ -74,3 +74,83 @@
 .plot-filter-label.active{background:var(--panel-secondary);color:var(--text-primary);border-color:var(--border-strong);font-weight:650}
 .plot-actions .plot-reset{min-height:31px;margin:0}
 @media(max-width:700px){.plot-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.plot-filter-label{max-width:100%}}
+
+
+/* Simplified top-right theme control */
+.theme-toggle-copy,
+.theme-toggle-caption {
+  display: none;
+}
+
+#themeLabel {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#themeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1em;
+  font-size: 15px;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   GLOBAL ACTIVE-FILTER INDICATOR
+   ========================================================= */
+
+.plot-actions {
+  display: inline-flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.plot-filter-label,
+.plot-reset {
+  min-height: 31px;
+  padding: 7px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.plot-filter-label {
+  display: inline-flex;
+  align-items: center;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.plot-filter-label.active {
+  background: var(--panel-secondary);
+  color: var(--navy);
+  border-color: var(--border-strong);
+}
+
+.plot-reset {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .plot-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .plot-filter-label {
+    max-width: 100%;
+  }
+}
