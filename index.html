@@ -1,199 +1,570 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Student Analytics Lab</title>
 
-  <link rel="stylesheet" href="css/styles.css">
+  <link
+    rel="stylesheet"
+    href="css/styles.css"
+  >
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"
+  ></script>
+
+  <script
+    src="https://cdn.plot.ly/plotly-2.35.2.min.js"
+  ></script>
 </head>
+
 
 <body>
 
 <header class="hero">
+
   <div class="hero-inner">
-    <p class="eyebrow">Applied Analytics Lab</p>
-    <h1>Student Analytics Dashboard</h1>
-    <p class="hero-subtitle">
-      Interactive exploration of simulated enrollment, retention, academic performance,
-      and student risk.
+
+    <p class="eyebrow">
+      Applied Analytics Lab
     </p>
+
+    <h1>
+      Student Analytics Dashboard
+    </h1>
+
+    <p class="hero-subtitle">
+      Explore simulated student enrollment,
+      academic performance, engagement,
+      retention, graduation, and risk.
+    </p>
+
   </div>
+
 </header>
 
+
 <main class="container">
+
+
+  <!-- =========================
+       FILTERS
+       ========================= -->
 
   <section class="filter-panel">
 
     <div class="filter-group">
-      <label for="yearFilter">Academic year</label>
+
+      <label for="yearFilter">
+        Academic year
+      </label>
+
       <select id="yearFilter">
-        <option value="all">All years</option>
+
+        <option value="all">
+          All years
+        </option>
+
       </select>
+
     </div>
 
+
     <div class="filter-group">
-      <label for="departmentFilter">Department</label>
+
+      <label for="termFilter">
+        Term
+      </label>
+
+      <select id="termFilter">
+
+        <option value="all">
+          All terms
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label for="departmentFilter">
+        Department
+      </label>
+
       <select id="departmentFilter">
-        <option value="all">All departments</option>
+
+        <option value="all">
+          All departments
+        </option>
+
       </select>
+
     </div>
 
+
     <div class="filter-group">
-      <label for="studentTypeFilter">Student type</label>
+
+      <label for="programFilter">
+        Program
+      </label>
+
+      <select id="programFilter">
+
+        <option value="all">
+          All programs
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label for="studentTypeFilter">
+        Student type
+      </label>
+
       <select id="studentTypeFilter">
-        <option value="all">All student types</option>
+
+        <option value="all">
+          All student types
+        </option>
+
       </select>
+
     </div>
 
+
     <div class="filter-group">
-      <label for="riskFilter">Risk level</label>
+
+      <label for="riskFilter">
+        Risk level
+      </label>
+
       <select id="riskFilter">
-        <option value="all">All risk levels</option>
+
+        <option value="all">
+          All risk levels
+        </option>
+
       </select>
+
     </div>
+
 
     <div class="filter-actions">
-      <button id="resetFilters" type="button">
+
+      <button
+        id="resetFilters"
+        type="button"
+      >
         Reset filters
       </button>
+
     </div>
 
   </section>
 
+
+  <!-- =========================
+       ACTIVE FILTERS
+       ========================= -->
+
+  <section class="active-filter-panel">
+
+    <div>
+
+      <span class="active-filter-title">
+        Active filters
+      </span>
+
+      <div
+        id="activeFilters"
+        class="active-filter-list"
+      ></div>
+
+    </div>
+
+
+    <button
+      id="clearSelection"
+      class="secondary-button"
+      type="button"
+      disabled
+    >
+      Clear selected students
+    </button>
+
+  </section>
+
+
+  <!-- =========================
+       KPI CARDS
+       ========================= -->
 
   <section class="metrics">
 
     <article class="metric-card">
-      <div class="metric-label">Students</div>
-      <div id="studentCount" class="metric-value">—</div>
+
+      <div class="metric-label">
+        Students
+      </div>
+
+      <div
+        id="studentCount"
+        class="metric-value"
+      >
+        —
+      </div>
+
     </article>
 
-    <article class="metric-card">
-      <div class="metric-label">Retention rate</div>
-      <div id="retentionRate" class="metric-value">—</div>
-    </article>
 
     <article class="metric-card">
-      <div class="metric-label">Average GPA</div>
-      <div id="averageGPA" class="metric-value">—</div>
+
+      <div class="metric-label">
+        Retention rate
+      </div>
+
+      <div
+        id="retentionRate"
+        class="metric-value"
+      >
+        —
+      </div>
+
     </article>
 
+
     <article class="metric-card">
-      <div class="metric-label">High-risk students</div>
-      <div id="highRiskRate" class="metric-value">—</div>
+
+      <div class="metric-label">
+        Graduation rate
+      </div>
+
+      <div
+        id="graduationRate"
+        class="metric-value"
+      >
+        —
+      </div>
+
+    </article>
+
+
+    <article class="metric-card">
+
+      <div class="metric-label">
+        Average GPA
+      </div>
+
+      <div
+        id="averageGPA"
+        class="metric-value"
+      >
+        —
+      </div>
+
+    </article>
+
+
+    <article class="metric-card">
+
+      <div class="metric-label">
+        High-risk students
+      </div>
+
+      <div
+        id="highRiskRate"
+        class="metric-value"
+      >
+        —
+      </div>
+
     </article>
 
   </section>
 
+
+  <!-- =========================
+       DASHBOARD
+       ========================= -->
 
   <section class="dashboard-grid">
 
-    <article class="chart-card chart-wide">
-      <div class="chart-heading">
-        <div>
-          <h2>Enrollment trend</h2>
-          <p>Student records represented in the current filter selection.</p>
-        </div>
-      </div>
 
-      <div class="chart-container">
-        <canvas id="enrollmentChart"></canvas>
-      </div>
-    </article>
-
-
-    <article class="chart-card">
-      <div class="chart-heading">
-        <div>
-          <h2>Risk distribution</h2>
-          <p>Current students by simulated risk category.</p>
-        </div>
-      </div>
-
-      <div class="chart-container">
-        <canvas id="riskChart"></canvas>
-      </div>
-    </article>
-
-
-    <article class="chart-card chart-wide">
-      <div class="chart-heading">
-        <div>
-          <h2>Students by department and type</h2>
-          <p>Click a department to filter the entire dashboard.</p>
-        </div>
-      </div>
-
-      <div class="chart-container">
-        <canvas id="departmentChart"></canvas>
-      </div>
-    </article>
-
-
-    <article class="chart-card chart-wide">
-      <div class="chart-heading">
-        <div>
-          <h2>GPA vs. completed credits</h2>
-          <p>
-            Hover over observations for student details. Point size reflects advising visits.
-          </p>
-        </div>
-      </div>
-
-      <div id="gpaScatter" class="plotly-chart"></div>
-    </article>
-
+    <!-- Trend -->
 
     <article class="chart-card chart-full">
+
       <div class="chart-heading">
+
         <div>
-          <h2>Retention heatmap</h2>
-          <p>Retention rate by department and academic year.</p>
+
+          <h2>
+            Enrollment and retention trend
+          </h2>
+
+          <p>
+            Student volume and retention rate
+            across academic years.
+          </p>
+
         </div>
+
       </div>
 
-      <div id="retentionHeatmap" class="plotly-chart heatmap-chart"></div>
+      <div
+        id="trendChart"
+        class="plotly-chart large-chart"
+      ></div>
+
     </article>
+
+
+    <!-- Department -->
+
+    <article class="chart-card">
+
+      <div class="chart-heading">
+
+        <div>
+
+          <h2>
+            Students by department
+          </h2>
+
+          <p>
+            Click a department to filter
+            the entire dashboard.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="departmentChart"
+        class="plotly-chart"
+      ></div>
+
+    </article>
+
+
+    <!-- Risk -->
+
+    <article class="chart-card">
+
+      <div class="chart-heading">
+
+        <div>
+
+          <h2>
+            Risk profile
+          </h2>
+
+          <p>
+            Click a risk category to
+            cross-filter the dashboard.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="riskChart"
+        class="plotly-chart"
+      ></div>
+
+    </article>
+
+
+    <!-- Scatter -->
+
+    <article class="chart-card chart-full">
+
+      <div class="chart-heading">
+
+        <div>
+
+          <h2>
+            GPA vs. attendance
+          </h2>
+
+          <p>
+            Point size represents advising visits.
+            Use box or lasso selection to select students.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="scatterChart"
+        class="plotly-chart large-chart"
+      ></div>
+
+    </article>
+
+
+    <!-- Heatmap -->
+
+    <article class="chart-card chart-full">
+
+      <div class="chart-heading">
+
+        <div>
+
+          <h2>
+            Retention heatmap
+          </h2>
+
+          <p>
+            Click a cell to filter by both
+            department and academic year.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="heatmapChart"
+        class="plotly-chart heatmap-chart"
+      ></div>
+
+    </article>
+
+
+    <!-- Box plot -->
+
+    <article class="chart-card">
+
+      <div class="chart-heading">
+
+        <div>
+
+          <h2>
+            GPA distribution
+          </h2>
+
+          <p>
+            Distribution of GPA
+            across departments.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="boxChart"
+        class="plotly-chart"
+      ></div>
+
+    </article>
+
+
+    <!-- Sankey -->
+
+    <article class="chart-card">
+
+      <div class="chart-heading">
+
+        <div>
+
+          <h2>
+            Student outcomes flow
+          </h2>
+
+          <p>
+            Simulated pathway from risk
+            to retention and graduation.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        id="sankeyChart"
+        class="plotly-chart"
+      ></div>
+
+    </article>
+
 
   </section>
 
+
+  <!-- =========================
+       STUDENT TABLE
+       ========================= -->
 
   <section class="table-card">
 
     <div class="table-heading">
+
       <div>
-        <h2>Student records</h2>
+
+        <h2>
+          Student records
+        </h2>
+
         <p>
-          Showing the first 100 records matching the current filters.
+          First 100 students in the
+          current dashboard selection.
         </p>
+
       </div>
 
-      <div id="tableCount" class="table-count"></div>
+
+      <div
+        id="tableCount"
+        class="table-count"
+      ></div>
+
     </div>
+
 
     <div class="table-wrapper">
 
       <table id="studentTable">
 
         <thead>
+
           <tr>
-            <th>Student ID</th>
+
+            <th>Student</th>
             <th>Year</th>
+            <th>Term</th>
             <th>Department</th>
+            <th>Program</th>
             <th>Type</th>
             <th>GPA</th>
-            <th>Credits</th>
             <th>Attendance</th>
+            <th>Engagement</th>
+            <th>Credits</th>
             <th>Risk</th>
             <th>Retained</th>
+            <th>Graduated</th>
+
           </tr>
+
         </thead>
+
 
         <tbody></tbody>
 
@@ -203,13 +574,20 @@
 
   </section>
 
+
 </main>
 
+
 <footer class="footer">
-  Simulated data for demonstration purposes only.
+
+  Simulated student data for
+  demonstration purposes only.
+
 </footer>
+
 
 <script src="js/dashboard.js"></script>
 
 </body>
+
 </html>
