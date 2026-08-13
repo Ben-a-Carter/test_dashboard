@@ -1,23 +1,26 @@
 :root {
+
   --navy: #1f3864;
   --blue: #2e75b6;
-  --light-blue: #dce8f4;
+  --blue-light: #dce8f4;
 
   --green: #548235;
   --orange: #d98c31;
   --red: #c94c4c;
+  --purple: #7665a8;
 
   --gray-25: #fbfbfa;
   --gray-50: #f8f7f5;
   --gray-100: #f0eeeb;
   --gray-200: #e2e0db;
   --gray-300: #cac7c1;
-
+  --gray-500: #96938d;
   --gray-600: #73726c;
   --gray-700: #575650;
   --gray-800: #3d3d3a;
 
   --white: #ffffff;
+
 }
 
 
@@ -27,6 +30,7 @@
 
 
 body {
+
   margin: 0;
 
   font-family:
@@ -36,410 +40,879 @@ body {
     "Segoe UI",
     sans-serif;
 
-  background: var(--gray-50);
-  color: var(--gray-800);
+  background:
+    var(--gray-50);
+
+  color:
+    var(--gray-800);
+
 }
 
 
+/* =========================
+   HEADER
+   ========================= */
+
+
 .hero {
+
   background:
+
     radial-gradient(
       ellipse at 30% 20%,
-      rgba(46, 117, 182, 0.45),
+      rgba(46,117,182,.45),
       transparent 55%
     ),
+
     var(--navy);
 
-  color: white;
+  color:
+    white;
+
 }
 
 
 .hero-inner {
-  max-width: 1150px;
 
-  margin: 0 auto;
-  padding: 70px 24px;
+  max-width:
+    1250px;
+
+  margin:
+    0 auto;
+
+  padding:
+    70px 24px;
+
 }
 
 
 .eyebrow {
-  margin: 0 0 10px 0;
 
-  font-size: 13px;
-  font-weight: 700;
+  margin:
+    0 0 10px;
 
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size:
+    13px;
 
-  opacity: 0.8;
+  font-weight:
+    700;
+
+  letter-spacing:
+    .12em;
+
+  text-transform:
+    uppercase;
+
+  opacity:
+    .8;
+
 }
 
 
 .hero h1 {
-  margin: 0;
 
-  font-size: clamp(34px, 5vw, 54px);
-  line-height: 1.05;
+  margin:
+    0;
+
+  font-size:
+    clamp(
+      34px,
+      5vw,
+      56px
+    );
+
+  line-height:
+    1.05;
+
 }
 
 
 .hero-subtitle {
-  max-width: 720px;
 
-  margin-top: 18px;
-  margin-bottom: 0;
+  max-width:
+    760px;
 
-  font-size: 17px;
-  line-height: 1.6;
+  margin:
+    18px 0 0;
 
-  opacity: 0.85;
+  font-size:
+    17px;
+
+  line-height:
+    1.6;
+
+  opacity:
+    .86;
+
 }
+
+
+/* =========================
+   PAGE
+   ========================= */
 
 
 .container {
-  max-width: 1150px;
 
-  margin: 0 auto;
-  padding: 40px 24px 70px;
+  max-width:
+    1250px;
+
+  margin:
+    auto;
+
+  padding:
+    38px 24px 70px;
+
 }
 
 
+/* =========================
+   FILTERS
+   ========================= */
+
+
 .filter-panel {
-  display: grid;
+
+  display:
+    grid;
 
   grid-template-columns:
-    repeat(4, minmax(150px, 1fr))
-    auto;
+    repeat(
+      3,
+      minmax(160px, 1fr)
+    );
 
-  gap: 16px;
+  gap:
+    16px;
 
-  align-items: end;
+  align-items:
+    end;
 
-  margin-bottom: 28px;
-  padding: 20px;
+  padding:
+    20px;
 
-  background: white;
+  margin-bottom:
+    16px;
 
-  border: 1px solid var(--gray-200);
-  border-radius: 14px;
+  background:
+    white;
+
+  border:
+    1px solid
+    var(--gray-200);
+
+  border-radius:
+    14px;
+
 }
 
 
 .filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    7px;
+
 }
 
 
 .filter-group label {
-  color: var(--gray-700);
 
-  font-size: 13px;
-  font-weight: 650;
+  font-size:
+    13px;
+
+  font-weight:
+    650;
+
+  color:
+    var(--gray-700);
+
 }
 
 
 select,
 button {
-  font: inherit;
+
+  font:
+    inherit;
+
 }
 
 
 select {
-  width: 100%;
 
-  padding: 10px 12px;
+  width:
+    100%;
 
-  border: 1px solid var(--gray-300);
-  border-radius: 8px;
+  padding:
+    10px 12px;
 
-  background: white;
-  color: var(--gray-800);
+  background:
+    white;
+
+  color:
+    var(--gray-800);
+
+  border:
+    1px solid
+    var(--gray-300);
+
+  border-radius:
+    8px;
+
 }
 
 
 button {
-  padding: 10px 16px;
 
-  border: 0;
-  border-radius: 8px;
+  padding:
+    10px 16px;
 
-  background: var(--navy);
-  color: white;
+  border:
+    0;
 
-  cursor: pointer;
+  border-radius:
+    8px;
+
+  background:
+    var(--navy);
+
+  color:
+    white;
+
+  cursor:
+    pointer;
+
 }
 
 
 button:hover {
-  opacity: 0.9;
+
+  opacity:
+    .9;
+
 }
 
 
+button:disabled {
+
+  opacity:
+    .4;
+
+  cursor:
+    default;
+
+}
+
+
+.secondary-button {
+
+  background:
+    var(--gray-100);
+
+  color:
+    var(--gray-700);
+
+  border:
+    1px solid
+    var(--gray-300);
+
+}
+
+
+.filter-actions {
+
+  display:
+    flex;
+
+  align-items:
+    end;
+
+}
+
+
+/* =========================
+   ACTIVE FILTERS
+   ========================= */
+
+
+.active-filter-panel {
+
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  gap:
+    20px;
+
+  margin-bottom:
+    24px;
+
+  min-height:
+    45px;
+
+}
+
+
+.active-filter-title {
+
+  display:
+    block;
+
+  margin-bottom:
+    7px;
+
+  color:
+    var(--gray-600);
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .06em;
+
+}
+
+
+.active-filter-list {
+
+  display:
+    flex;
+
+  gap:
+    7px;
+
+  flex-wrap:
+    wrap;
+
+}
+
+
+.filter-chip {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  padding:
+    5px 9px;
+
+  background:
+    var(--blue-light);
+
+  color:
+    var(--navy);
+
+  border-radius:
+    999px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    600;
+
+}
+
+
+.no-filter {
+
+  color:
+    var(--gray-500);
+
+  font-size:
+    13px;
+
+}
+
+
+/* =========================
+   KPI CARDS
+   ========================= */
+
+
 .metrics {
-  display: grid;
+
+  display:
+    grid;
 
   grid-template-columns:
-    repeat(4, minmax(0, 1fr));
+    repeat(
+      5,
+      minmax(0,1fr)
+    );
 
-  gap: 18px;
+  gap:
+    16px;
 
-  margin-bottom: 28px;
+  margin-bottom:
+    24px;
+
 }
 
 
 .metric-card {
-  padding: 22px;
 
-  background: white;
+  padding:
+    20px;
 
-  border: 1px solid var(--gray-200);
-  border-radius: 14px;
+  background:
+    white;
+
+  border:
+    1px solid
+    var(--gray-200);
+
+  border-radius:
+    14px;
+
 }
 
 
 .metric-label {
-  color: var(--gray-600);
 
-  font-size: 13px;
-  font-weight: 600;
+  color:
+    var(--gray-600);
+
+  font-size:
+    13px;
+
+  font-weight:
+    600;
+
 }
 
 
 .metric-value {
-  margin-top: 8px;
 
-  color: var(--navy);
+  margin-top:
+    8px;
 
-  font-size: 32px;
-  font-weight: 750;
+  color:
+    var(--navy);
+
+  font-size:
+    31px;
+
+  font-weight:
+    750;
+
 }
 
 
+/* =========================
+   VISUALIZATIONS
+   ========================= */
+
+
 .dashboard-grid {
-  display: grid;
+
+  display:
+    grid;
 
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+    repeat(
+      2,
+      minmax(0,1fr)
+    );
 
-  gap: 22px;
+  gap:
+    22px;
+
 }
 
 
 .chart-card {
-  padding: 22px;
 
-  background: white;
+  min-width:
+    0;
 
-  border: 1px solid var(--gray-200);
-  border-radius: 14px;
+  padding:
+    22px;
 
-  min-width: 0;
-}
+  background:
+    white;
 
+  border:
+    1px solid
+    var(--gray-200);
 
-.chart-wide {
-  min-height: 430px;
+  border-radius:
+    14px;
+
 }
 
 
 .chart-full {
-  grid-column: 1 / -1;
+
+  grid-column:
+    1 / -1;
+
 }
 
 
 .chart-heading {
-  display: flex;
 
-  justify-content: space-between;
-  align-items: flex-start;
+  display:
+    flex;
 
-  margin-bottom: 16px;
+  justify-content:
+    space-between;
+
+  align-items:
+    flex-start;
+
+  margin-bottom:
+    12px;
+
 }
 
 
 .chart-heading h2,
 .table-heading h2 {
-  margin: 0 0 6px 0;
 
-  font-size: 18px;
+  margin:
+    0 0 6px;
+
+  font-size:
+    18px;
+
 }
 
 
 .chart-heading p,
 .table-heading p {
-  margin: 0;
 
-  color: var(--gray-600);
+  margin:
+    0;
 
-  font-size: 13px;
-  line-height: 1.5;
-}
+  color:
+    var(--gray-600);
 
+  font-size:
+    13px;
 
-.chart-container {
-  position: relative;
+  line-height:
+    1.5;
 
-  height: 340px;
 }
 
 
 .plotly-chart {
-  width: 100%;
-  height: 360px;
+
+  width:
+    100%;
+
+  height:
+    380px;
+
+}
+
+
+.large-chart {
+
+  height:
+    440px;
+
 }
 
 
 .heatmap-chart {
-  height: 420px;
+
+  height:
+    420px;
+
 }
 
 
+/* =========================
+   TABLE
+   ========================= */
+
+
 .table-card {
-  margin-top: 22px;
-  padding: 22px;
 
-  background: white;
+  margin-top:
+    22px;
 
-  border: 1px solid var(--gray-200);
-  border-radius: 14px;
+  padding:
+    22px;
+
+  background:
+    white;
+
+  border:
+    1px solid
+    var(--gray-200);
+
+  border-radius:
+    14px;
+
 }
 
 
 .table-heading {
-  display: flex;
 
-  justify-content: space-between;
-  align-items: flex-start;
+  display:
+    flex;
 
-  gap: 20px;
+  justify-content:
+    space-between;
 
-  margin-bottom: 16px;
+  gap:
+    20px;
+
+  margin-bottom:
+    16px;
+
 }
 
 
 .table-count {
-  color: var(--gray-600);
 
-  font-size: 13px;
-  white-space: nowrap;
+  color:
+    var(--gray-600);
+
+  font-size:
+    13px;
+
+  white-space:
+    nowrap;
+
 }
 
 
 .table-wrapper {
-  overflow-x: auto;
+
+  overflow-x:
+    auto;
+
 }
 
 
 table {
-  width: 100%;
 
-  border-collapse: collapse;
+  width:
+    100%;
 
-  font-size: 13px;
+  border-collapse:
+    collapse;
+
+  font-size:
+    12px;
+
 }
 
 
 thead {
-  background: var(--gray-50);
+
+  background:
+    var(--gray-50);
+
 }
 
 
 th,
 td {
-  padding: 11px 12px;
 
-  border-bottom: 1px solid var(--gray-200);
+  padding:
+    10px 11px;
 
-  text-align: left;
-  white-space: nowrap;
+  border-bottom:
+    1px solid
+    var(--gray-200);
+
+  text-align:
+    left;
+
+  white-space:
+    nowrap;
+
 }
 
 
 th {
-  color: var(--gray-700);
 
-  font-weight: 650;
+  color:
+    var(--gray-700);
+
+  font-weight:
+    650;
+
 }
 
 
 .risk-low {
-  color: var(--green);
-  font-weight: 650;
+
+  color:
+    var(--green);
+
+  font-weight:
+    700;
+
 }
 
 
 .risk-medium {
-  color: var(--orange);
-  font-weight: 650;
+
+  color:
+    var(--orange);
+
+  font-weight:
+    700;
+
 }
 
 
 .risk-high {
-  color: var(--red);
-  font-weight: 650;
+
+  color:
+    var(--red);
+
+  font-weight:
+    700;
+
 }
 
 
 .footer {
-  padding: 30px;
 
-  text-align: center;
+  padding:
+    28px;
 
-  color: var(--gray-600);
+  text-align:
+    center;
 
-  font-size: 12px;
+  color:
+    var(--gray-600);
+
+  font-size:
+    12px;
+
 }
 
 
-@media (max-width: 950px) {
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+
+@media (
+  max-width: 1000px
+) {
 
   .filter-panel {
+
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
   }
 
 
   .metrics {
+
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
+
   }
 
+}
+
+
+@media (
+  max-width: 800px
+) {
 
   .dashboard-grid {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
 
 
   .chart-full {
-    grid-column: auto;
+
+    grid-column:
+      auto;
+
+  }
+
+
+  .active-filter-panel {
+
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
   }
 
 }
 
 
-@media (max-width: 600px) {
+@media (
+  max-width: 600px
+) {
 
-  .filter-panel {
-    grid-template-columns: 1fr;
-  }
-
-
+  .filter-panel,
   .metrics {
-    grid-template-columns: 1fr;
-  }
 
+    grid-template-columns:
+      1fr;
 
-  .hero-inner {
-    padding-top: 50px;
-    padding-bottom: 50px;
   }
 
 
   .container {
-    padding-left: 16px;
-    padding-right: 16px;
+
+    padding-left:
+      15px;
+
+    padding-right:
+      15px;
+
+  }
+
+
+  .hero-inner {
+
+    padding:
+      50px 20px;
+
+  }
+
+
+  .plotly-chart {
+
+    height:
+      340px;
+
   }
 
 }
