@@ -986,6 +986,157 @@ function attachHoverOutline(
 }
 
 
+
+function getPlotExportTitle(
+  plot
+) {
+
+  const card =
+    plot.closest(
+      ".chart-card"
+    );
+
+
+  const heading =
+    card?.querySelector(
+      ".chart-heading h2, .chart-heading h3"
+    );
+
+
+  return heading
+    ?.textContent
+    ?.trim() ||
+    "Visualization";
+
+}
+
+
+async function exportPlotImageWithTitle(
+  plot,
+  format
+) {
+
+  const exportTitle =
+    getPlotExportTitle(
+      plot
+    );
+
+
+  /*
+    Preserve the live interactive layout.
+
+    The export title is added only for the downloaded image,
+    so the dashboard itself does not gain a duplicate title.
+  */
+
+  const originalTitle =
+    plot.layout?.title
+      ? JSON.parse(
+          JSON.stringify(
+            plot.layout.title
+          )
+        )
+      : null;
+
+
+  const originalMargin =
+    plot.layout?.margin
+      ? {
+          ...plot.layout.margin
+        }
+      : {};
+
+
+  const exportMargin = {
+
+    ...originalMargin,
+
+    t:
+      Math.max(
+        Number(
+          originalMargin.t ||
+          0
+        ),
+        70
+      )
+
+  };
+
+
+  try {
+
+    await Plotly.relayout(
+      plot,
+      {
+        title: {
+          text:
+            exportTitle,
+
+          x:
+            0.02,
+
+          xanchor:
+            "left",
+
+          y:
+            0.98,
+
+          yanchor:
+            "top",
+
+          font: {
+            size:
+              20
+          }
+        },
+
+        margin:
+          exportMargin
+      }
+    );
+
+
+    await exportPlotImageWithTitle(plot, format);
+
+  }
+
+  finally {
+
+    const restoreUpdate = {
+
+      margin:
+        originalMargin
+
+    };
+
+
+    if (
+      originalTitle
+    ) {
+
+      restoreUpdate.title =
+        originalTitle;
+
+    }
+
+    else {
+
+      restoreUpdate.title =
+        null;
+
+    }
+
+
+    await Plotly.relayout(
+      plot,
+      restoreUpdate
+    );
+
+  }
+
+}
+
+
 function initializeExportControls(){
   const plots={trendChart:'trend',categoryChart:'category',statusChart:'status',scatterChart:'scatter',heatmapChart:'heatmap',distributionChart:'distribution',flowChart:'flow'};
   Object.entries(plots).forEach(([plotId,source])=>{
