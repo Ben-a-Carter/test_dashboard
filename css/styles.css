@@ -223,20 +223,59 @@ button, select { font: inherit; }
   color: var(--text-primary);
 }
 .anchor-filters-toggle[aria-pressed="true"] {
-  background: var(--blue-light);
-  color: var(--navy);
+  background: var(--panel-secondary);
+  color: var(--text-secondary);
 }
-.anchor-filters-toggle:focus-visible {
-  outline: 2px solid var(--navy);
-  outline-offset: 2px;
-}
+
+/* =========================================================
+   THEME-AWARE FILTER SNOWFLAKE ICON
+   ========================================================= */
+
+/*
+ * State:
+ *   full opacity     = filters stay in their default position
+ *   reduced opacity = filters follow scrolling
+ *
+ * The snowflake inherits currentColor so it automatically
+ * follows the dashboard's light/dark theme.
+ */
+/* =========================================================
+   THEME-AWARE FILTER SNOWFLAKE ICON
+   ========================================================= */
+
 .anchor-filter-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
-  line-height: 1;
+  width: 19px;
+  height: 19px;
+  color: currentColor;
+  opacity: 1;
+  transition:
+    opacity .16s ease,
+    color .16s ease;
 }
+
+.anchor-filter-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.anchor-filters-toggle[aria-pressed="true"] .anchor-filter-icon {
+  opacity: .38;
+}
+
+.anchor-filters-toggle:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
 
 #filterControls {
   display: grid;
