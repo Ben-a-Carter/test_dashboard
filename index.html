@@ -1,105 +1,707 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Student Analytics Lab</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <link
+    rel="stylesheet"
+    href="css/styles.css"
+  >
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"
+  ></script>
+
+  <script
+    src="https://cdn.plot.ly/plotly-2.35.2.min.js"
+  ></script>
 </head>
+
+
 <body>
-  <header class="hero">
-    <div class="hero-inner">
-      <p class="eyebrow">Applied Analytics Lab</p>
-      <h1>Student Analytics Dashboard</h1>
-      <p class="hero-subtitle">Explore simulated student enrollment, performance, engagement, retention, graduation, and risk with coordinated interactive views.</p>
-    </div>
-  </header>
 
-  <div class="page-shell">
-    <aside class="filters-sidebar">
-      <div class="filter-panel">
-        <div class="filter-panel-heading">
-          <div>
-            <p class="eyebrow-dark">Filters</p>
-            <h2>Dashboard controls</h2>
-          </div>
-          <button id="resetFilters" class="primary-button" type="button">Reset all</button>
-        </div>
+<header class="hero">
 
-        <div class="filter-group"><label for="yearFilter">Academic year</label><select id="yearFilter"><option value="all">All years</option></select></div>
-        <div class="filter-group"><label for="termFilter">Term</label><select id="termFilter"><option value="all">All terms</option></select></div>
-        <div class="filter-group"><label for="departmentFilter">Department</label><select id="departmentFilter"><option value="all">All departments</option></select></div>
-        <div class="filter-group"><label for="programFilter">Program</label><select id="programFilter"><option value="all">All programs</option></select></div>
-        <div class="filter-group"><label for="studentTypeFilter">Student type</label><select id="studentTypeFilter"><option value="all">All student types</option></select></div>
-        <div class="filter-group"><label for="riskFilter">Risk level</label><select id="riskFilter"><option value="all">All risk levels</option></select></div>
+  <div class="hero-inner">
 
-        <div class="active-filter-block">
-          <span class="active-filter-title">Active actions</span>
-          <div id="activeFilters" class="active-filter-list"></div>
-        </div>
-      </div>
-    </aside>
+    <p class="eyebrow">
+      Applied Analytics Lab
+    </p>
 
-    <main class="dashboard-main">
-      <section class="metrics">
-        <article class="metric-card"><div class="metric-label">Students</div><div id="studentCount" class="metric-value">—</div></article>
-        <article class="metric-card"><div class="metric-label">Retention rate</div><div id="retentionRate" class="metric-value">—</div></article>
-        <article class="metric-card"><div class="metric-label">Graduation rate</div><div id="graduationRate" class="metric-value">—</div></article>
-        <article class="metric-card"><div class="metric-label">Average GPA</div><div id="averageGPA" class="metric-value">—</div></article>
-        <article class="metric-card"><div class="metric-label">High-risk students</div><div id="highRiskRate" class="metric-value">—</div></article>
-      </section>
+    <h1>
+      Student Analytics Dashboard
+    </h1>
 
-      <section class="hover-status" id="hoverStatus">Hover over a mark to cross-highlight related students. Click marks to filter other views.</section>
+    <p class="hero-subtitle">
+      Explore simulated student enrollment,
+      performance, engagement, retention,
+      graduation, and risk using coordinated
+      interactive visualizations.
+    </p>
 
-      <section class="dashboard-grid">
-        <article class="chart-card chart-full">
-          <div class="chart-heading"><div><h2>Enrollment and retention trend</h2><p>Click a year to filter the other views. Hover to highlight matching students.</p></div><button id="trendReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="trendChart" class="plotly-chart large-chart"></div>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-heading"><div><h2>Students by department</h2><p>Click a department to cross-filter the dashboard.</p></div><button id="departmentReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="departmentChart" class="plotly-chart"></div>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-heading"><div><h2>Risk profile</h2><p>Click a slice to filter the other visualizations.</p></div><button id="riskReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="riskChart" class="plotly-chart"></div>
-        </article>
-
-        <article class="chart-card chart-full">
-          <div class="chart-heading"><div><h2>GPA vs. attendance</h2><p>Use lasso or box select to filter the rest of the dashboard to selected students.</p></div><button id="scatterReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="scatterChart" class="plotly-chart large-chart"></div>
-        </article>
-
-        <article class="chart-card chart-full">
-          <div class="chart-heading"><div><h2>Retention heatmap</h2><p>Click a cell to filter by department and year.</p></div><button id="heatmapReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="heatmapChart" class="plotly-chart heatmap-chart"></div>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-heading"><div><h2>GPA distribution</h2><p>Click a department box to filter the other views.</p></div><button id="boxReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="boxChart" class="plotly-chart"></div>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-heading"><div><h2>Student outcomes flow</h2><p>Click outcome nodes to filter by retention or graduation status.</p></div><button id="sankeyReset" class="plot-reset" type="button">Reset this plot</button></div>
-          <div id="sankeyChart" class="plotly-chart"></div>
-        </article>
-      </section>
-
-      <section class="table-card">
-        <div class="table-heading"><div><h2>Student records</h2><p>Click any column heading to sort. Numeric cells use a within-column color scale.</p></div><div id="tableCount" class="table-count"></div></div>
-        <div class="table-wrapper">
-          <table id="studentTable"><thead><tr id="studentTableHeader"></tr></thead><tbody></tbody></table>
-        </div>
-      </section>
-    </main>
   </div>
 
-  <footer class="footer">Simulated student data for demonstration purposes only.</footer>
-  <script src="js/dashboard.js"></script>
+</header>
+
+
+<div class="page-shell">
+
+
+  <!-- ==============================
+       STICKY FILTER SIDEBAR
+       ============================== -->
+
+  <aside class="filters-sidebar">
+
+    <div class="filter-panel">
+
+      <div class="filter-panel-heading">
+
+        <div>
+
+          <p class="eyebrow-dark">
+            Filters
+          </p>
+
+          <h2>
+            Dashboard controls
+          </h2>
+
+        </div>
+
+
+        <button
+          id="resetFilters"
+          class="primary-button"
+          type="button"
+        >
+          Reset all
+        </button>
+
+      </div>
+
+
+      <!-- THEME -->
+
+      <div class="theme-control">
+
+        <label for="themeSelect">
+          Appearance
+        </label>
+
+        <select id="themeSelect">
+
+          <option value="system">
+            System
+          </option>
+
+          <option value="light">
+            Light
+          </option>
+
+          <option value="dark">
+            Dark
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- YEAR -->
+
+      <div class="filter-group">
+
+        <label for="yearFilter">
+          Academic year
+        </label>
+
+        <select id="yearFilter">
+
+          <option value="all">
+            All years
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- TERM -->
+
+      <div class="filter-group">
+
+        <label for="termFilter">
+          Term
+        </label>
+
+        <select id="termFilter">
+
+          <option value="all">
+            All terms
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- DEPARTMENT -->
+
+      <div class="filter-group">
+
+        <label for="departmentFilter">
+          Department
+        </label>
+
+        <select id="departmentFilter">
+
+          <option value="all">
+            All departments
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PROGRAM -->
+
+      <div class="filter-group">
+
+        <label for="programFilter">
+          Program
+        </label>
+
+        <select id="programFilter">
+
+          <option value="all">
+            All programs
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- STUDENT TYPE -->
+
+      <div class="filter-group">
+
+        <label for="studentTypeFilter">
+          Student type
+        </label>
+
+        <select id="studentTypeFilter">
+
+          <option value="all">
+            All student types
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- RISK -->
+
+      <div class="filter-group">
+
+        <label for="riskFilter">
+          Risk level
+        </label>
+
+        <select id="riskFilter">
+
+          <option value="all">
+            All risk levels
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- ACTIVE ACTIONS -->
+
+      <div class="active-filter-block">
+
+        <span class="active-filter-title">
+          Active filters & actions
+        </span>
+
+        <div
+          id="activeFilters"
+          class="active-filter-list"
+        ></div>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ==============================
+       MAIN DASHBOARD
+       ============================== -->
+
+  <main class="dashboard-main">
+
+
+    <!-- KPI CARDS -->
+
+    <section class="metrics">
+
+      <article class="metric-card">
+
+        <div class="metric-label">
+          Students
+        </div>
+
+        <div
+          id="studentCount"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </article>
+
+
+      <article class="metric-card">
+
+        <div class="metric-label">
+          Retention rate
+        </div>
+
+        <div
+          id="retentionRate"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </article>
+
+
+      <article class="metric-card">
+
+        <div class="metric-label">
+          Graduation rate
+        </div>
+
+        <div
+          id="graduationRate"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </article>
+
+
+      <article class="metric-card">
+
+        <div class="metric-label">
+          Average GPA
+        </div>
+
+        <div
+          id="averageGPA"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </article>
+
+
+      <article class="metric-card">
+
+        <div class="metric-label">
+          High-risk students
+        </div>
+
+        <div
+          id="highRiskRate"
+          class="metric-value"
+        >
+          —
+        </div>
+
+      </article>
+
+    </section>
+
+
+    <!-- HOVER MESSAGE -->
+
+    <section
+      class="hover-status"
+      id="hoverStatus"
+    >
+
+      Hover over a mark to highlight related
+      students. Click categorical marks to
+      filter the other visualizations.
+
+    </section>
+
+
+    <!-- VISUALIZATIONS -->
+
+    <section class="dashboard-grid">
+
+
+      <!-- TREND -->
+
+      <article class="chart-card chart-full">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              Enrollment and retention trend
+            </h2>
+
+            <p>
+              Click a year to filter all other
+              visualizations and the table.
+            </p>
+
+          </div>
+
+
+          <button
+            id="trendReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="trendChart"
+          class="plotly-chart large-chart"
+        ></div>
+
+      </article>
+
+
+      <!-- DEPARTMENT -->
+
+      <article class="chart-card">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              Students by department
+            </h2>
+
+            <p>
+              Click a department to cross-filter
+              every other view.
+            </p>
+
+          </div>
+
+
+          <button
+            id="departmentReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="departmentChart"
+          class="plotly-chart"
+        ></div>
+
+      </article>
+
+
+      <!-- RISK -->
+
+      <article class="chart-card">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              Risk profile
+            </h2>
+
+            <p>
+              Click a risk category to filter
+              the rest of the dashboard.
+            </p>
+
+          </div>
+
+
+          <button
+            id="riskReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="riskChart"
+          class="plotly-chart"
+        ></div>
+
+      </article>
+
+
+      <!-- SCATTER -->
+
+      <article class="chart-card chart-full">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              GPA vs. attendance
+            </h2>
+
+            <p>
+              Use lasso or box select to filter
+              all other views to selected students.
+            </p>
+
+          </div>
+
+
+          <button
+            id="scatterReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="scatterChart"
+          class="plotly-chart large-chart"
+        ></div>
+
+      </article>
+
+
+      <!-- HEATMAP -->
+
+      <article class="chart-card chart-full">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              Retention heatmap
+            </h2>
+
+            <p>
+              Click a cell to filter by both
+              department and academic year.
+            </p>
+
+          </div>
+
+
+          <button
+            id="heatmapReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="heatmapChart"
+          class="plotly-chart heatmap-chart"
+        ></div>
+
+      </article>
+
+
+      <!-- BOX PLOT -->
+
+      <article class="chart-card">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              GPA distribution
+            </h2>
+
+            <p>
+              Click a department to filter
+              the other views.
+            </p>
+
+          </div>
+
+
+          <button
+            id="boxReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="boxChart"
+          class="plotly-chart"
+        ></div>
+
+      </article>
+
+
+      <!-- SANKEY -->
+
+      <article class="chart-card">
+
+        <div class="chart-heading">
+
+          <div>
+
+            <h2>
+              Student outcomes flow
+            </h2>
+
+            <p>
+              Click retention or graduation
+              outcomes to filter other views.
+            </p>
+
+          </div>
+
+
+          <button
+            id="sankeyReset"
+            class="plot-reset"
+            type="button"
+          >
+            Reset this plot
+          </button>
+
+        </div>
+
+
+        <div
+          id="sankeyChart"
+          class="plotly-chart"
+        ></div>
+
+      </article>
+
+    </section>
+
+
+    <!-- ==============================
+         TABLE
+         ============================== -->
+
+    <section class="table-card">
+
+      <div class="table-heading">
+
+        <div>
+
+          <h2>
+            Student records
+          </h2>
+
+          <p>
+            Click any column heading to sort.
+            Numeric cells use a within-column
+            color scale.
+          </p>
+
+        </div>
+
+
+        <div
+          id="tableCount"
+          class="table-count"
+        ></div>
+
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table id="studentTable">
+
+          <thead>
+
+            <tr id="studentTableHeader"></tr>
+
+          </thead>
+
+
+          <tbody></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<footer class="footer">
+
+  Simulated student data for
+  demonstration purposes only.
+
+</footer>
+
+
+<script src="js/dashboard.js"></script>
+
 </body>
+
 </html>
