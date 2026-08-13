@@ -954,3 +954,15 @@ th {
 @media (max-width: 420px) {
   #filterControls { grid-template-columns: 1fr; }
 }
+
+/* Desktop pointer cursor for interactive Plotly charts. */
+@media (hover: hover) and (pointer: fine) {
+  .plotly-chart,
+  .plotly-chart .plotly,
+  .plotly-chart .plotly .cursor-crosshair,
+  .plotly-chart .plotly .cursor-ew-resize,
+  .plotly-chart .plotly .cursor-ns-resize,
+  .plotly-chart .plotly .cursor-move {
+    cursor: pointer !important;
+  }
+}
