@@ -226,54 +226,72 @@ button, select { font: inherit; }
   background: var(--blue-light);
   color: var(--navy);
 }
-.anchor-filters-toggle:focus-visible {
-  outline: 2px solid var(--navy);
-  outline-offset: 2px;
-}
+
+/* =========================================================
+   THEME-AWARE FILTER LOCK ICON
+   ========================================================= */
+
+/*
+ * Solid padlock artwork inspired by the supplied visual reference.
+ * The icon is built entirely with CSS and currentColor so it
+ * automatically follows the active light/dark theme.
+ */
 .anchor-filter-icon {
   position: relative;
   display: inline-block;
-  width: 15px;
-  height: 16px;
+  width: 18px;
+  height: 19px;
   color: currentColor;
+  flex: 0 0 auto;
 }
 
-/* Lock body */
+/* Solid lock body */
 .anchor-filter-icon::after {
   content: "";
   position: absolute;
-  left: 2px;
-  bottom: 1px;
-  width: 11px;
-  height: 9px;
-  border: 2px solid currentColor;
-  border-radius: 2px;
-  background: transparent;
+  left: 1px;
+  bottom: 0;
+  width: 16px;
+  height: 11px;
+  border-radius: 3px;
+  background: currentColor;
 }
 
-/* Lock shackle: closed by default */
+/* Thick rounded shackle: closed by default */
 .anchor-filter-icon::before {
   content: "";
   position: absolute;
   left: 4px;
   top: 0;
-  width: 7px;
-  height: 8px;
-  border: 2px solid currentColor;
+  width: 10px;
+  height: 12px;
+  border: 3px solid currentColor;
   border-bottom: 0;
-  border-radius: 7px 7px 0 0;
-  transform-origin: 7px 8px;
+  border-radius: 8px 8px 0 0;
+  transform-origin: 9px 11px;
   transition:
     transform .16s ease,
-    left .16s ease;
+    left .16s ease,
+    top .16s ease;
 }
 
-/* When filters follow scrolling, show an open shackle. */
+/*
+ * When the filters follow scrolling, open the shackle.
+ * The body remains fixed so the two states read like a matched
+ * locked/unlocked icon pair.
+ */
 .anchor-filters-toggle[aria-pressed="true"]
 .anchor-filter-icon::before {
-  left: 6px;
-  transform: rotate(22deg) translateY(-1px);
+  left: 7px;
+  top: -1px;
+  transform: rotate(28deg);
 }
+
+.anchor-filters-toggle:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
 
 #filterControls {
   display: grid;
