@@ -784,6 +784,25 @@ th {
     gap: 14px;
   }
   .filters-sidebar.filters-anchored {
+    /*
+     * Sticky filter shadow controls:
+     *
+     * --filter-shadow-blur
+     *   Controls the softness / radius of the shadow.
+     *   Increase for a wider, softer shadow.
+     *
+     * --filter-shadow-spread
+     *   Controls how far the shadow begins outside the box.
+     *   Increase for a larger halo around the panel.
+     *
+     * --filter-shadow-strength
+     *   Controls the opacity of the shadow gradient.
+     *   Increase toward 1 for a stronger/darker shadow.
+     */
+    --filter-shadow-blur: 24px;
+    --filter-shadow-spread: 5px;
+    --filter-shadow-strength: .20;
+
     position: sticky;
     top: 18px;
     align-self: start;
@@ -791,14 +810,16 @@ th {
     overflow: auto;
     z-index: 50;
     border-radius: 14px;
+
     box-shadow:
-      0 0 0 4px var(--page-bg),
-      0 0 22px 8px rgba(0,0,0,.18);
+      0 0
+      var(--filter-shadow-blur)
+      var(--filter-shadow-spread)
+      rgba(0,0,0,var(--filter-shadow-strength));
   }
+
   [data-theme="dark"] .filters-sidebar.filters-anchored {
-    box-shadow:
-      0 0 0 4px var(--page-bg),
-      0 0 24px 9px rgba(0,0,0,.52);
+    --filter-shadow-strength: .48;
   }
 }
 
