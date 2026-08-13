@@ -190,30 +190,33 @@ button, select { font: inherit; }
   flex-wrap: wrap;
   gap: 7px;
 }
-.primary-button,
-.anchor-filters-toggle {
+.primary-button {
   min-height: 31px;
   padding: 7px 10px;
+  background: var(--navy);
+  color: white;
+  border: 0;
   border-radius: 8px;
   font-size: 12px;
   line-height: 1.2;
   white-space: nowrap;
   cursor: pointer;
 }
-.primary-button {
-  background: var(--navy);
-  color: white;
-  border: 0;
-}
 [data-theme="dark"] .primary-button { color: #111418; }
+
 .anchor-filters-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  min-width: 31px;
+  padding: 0;
   background: var(--panel-secondary);
   color: var(--text-secondary);
   border: 1px solid var(--border-strong);
-  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
 }
 .anchor-filters-toggle:hover {
   background: var(--panel-hover);
@@ -223,12 +226,53 @@ button, select { font: inherit; }
   background: var(--blue-light);
   color: var(--navy);
 }
+.anchor-filters-toggle:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
 .anchor-filter-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  line-height: 1;
+  position: relative;
+  display: inline-block;
+  width: 15px;
+  height: 16px;
+  color: currentColor;
+}
+
+/* Lock body */
+.anchor-filter-icon::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  bottom: 1px;
+  width: 11px;
+  height: 9px;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  background: transparent;
+}
+
+/* Lock shackle: closed by default */
+.anchor-filter-icon::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  width: 7px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  transform-origin: 7px 8px;
+  transition:
+    transform .16s ease,
+    left .16s ease;
+}
+
+/* When filters follow scrolling, show an open shackle. */
+.anchor-filters-toggle[aria-pressed="true"]
+.anchor-filter-icon::before {
+  left: 6px;
+  transform: rotate(22deg) translateY(-1px);
 }
 
 #filterControls {
