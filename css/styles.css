@@ -799,9 +799,9 @@ th {
      *   Controls the opacity of the shadow gradient.
      *   Increase toward 1 for a stronger/darker shadow.
      */
-    --filter-shadow-blur: 24px;
+    --filter-shadow-blur: 12px;
     --filter-shadow-spread: 7px;
-    --filter-shadow-strength: .80;
+    --filter-shadow-strength: .95;
 
     position: sticky;
     top: 18px;
