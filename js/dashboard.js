@@ -281,68 +281,144 @@ function renderPlotFilterChips() {
         }
 
 
+        const stack =
+          document.createElement(
+            "div"
+          );
+
+
+        stack.className =
+          "plot-filter-stack";
+
+
+        stack.tabIndex =
+          0;
+
+
+        stack.setAttribute(
+          "aria-label",
+          `${filters.length} active filter${filters.length === 1 ? "" : "s"}. Hover or focus to expand.`
+        );
+
+
+        const summary =
+          document.createElement(
+            "div"
+          );
+
+
+        summary.className =
+          "plot-filter-stack-summary";
+
+
+        const summaryText =
+          document.createElement(
+            "span"
+          );
+
+
+        summaryText.className =
+          "plot-filter-stack-summary-text";
+
+
+        summaryText.textContent =
+
+          filters.length ===
+          1
+
+            ? filters[0].label
+
+            : `${filters.length} active filters`;
+
+
+        const chevron =
+          document.createElement(
+            "span"
+          );
+
+
+        chevron.className =
+          "plot-filter-stack-chevron";
+
+
+        chevron.textContent =
+          "⌄";
+
+
+        summary.append(
+          summaryText,
+          chevron
+        );
+
+
+        const menu =
+          document.createElement(
+            "div"
+          );
+
+
+        menu.className =
+          "plot-filter-stack-menu";
+
+
         filters.forEach(
           filter => {
 
-            const chip =
+            const item =
               document.createElement(
                 "button"
               );
 
 
-            chip.type =
+            item.type =
               "button";
 
 
-            chip.className =
-              "plot-filter-chip";
+            item.className =
+              "plot-filter-stack-item";
 
 
-            chip.setAttribute(
+            item.setAttribute(
               "aria-label",
               `Remove filter ${filter.label}`
             );
 
 
-            chip.title =
-              `Remove filter ${filter.label}`;
-
-
-            const text =
+            const label =
               document.createElement(
                 "span"
               );
 
 
-            text.className =
-              "plot-filter-chip-text";
+            label.className =
+              "plot-filter-stack-item-label";
 
 
-            text.textContent =
+            label.textContent =
               filter.label;
 
 
-            const overlay =
+            const remove =
               document.createElement(
                 "span"
               );
 
 
-            overlay.className =
-              "plot-filter-chip-overlay";
+            remove.className =
+              "plot-filter-stack-item-remove";
 
 
-            overlay.textContent =
+            remove.textContent =
               "Remove filter";
 
 
-            chip.append(
-              text,
-              overlay
+            item.append(
+              label,
+              remove
             );
 
 
-            chip.addEventListener(
+            item.addEventListener(
               "click",
               event => {
 
@@ -359,11 +435,22 @@ function renderPlotFilterChips() {
             );
 
 
-            container.appendChild(
-              chip
+            menu.appendChild(
+              item
             );
 
           }
+        );
+
+
+        stack.append(
+          summary,
+          menu
+        );
+
+
+        container.appendChild(
+          stack
         );
 
       }
