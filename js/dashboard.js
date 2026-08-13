@@ -118,16 +118,6 @@ function getFiltersAffectingPlot(
       ]
     ) => {
 
-      if (
-        source ===
-        targetSource
-      ) {
-
-        return;
-
-      }
-
-
       const entries =
         Object.entries(
           sourceFilters
@@ -315,7 +305,7 @@ function renderPlotFilterChips() {
 
 
             chip.title =
-              `Click to delete ${filter.label}`;
+              `Remove filter ${filter.label}`;
 
 
             const text =
@@ -343,7 +333,7 @@ function renderPlotFilterChips() {
 
 
             overlay.textContent =
-              "Click to delete";
+              "Remove filter";
 
 
             chip.append(
