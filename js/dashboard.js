@@ -249,12 +249,12 @@ function initializeExportControls(){
 }
 
 document.addEventListener('click',()=>closeAllExportMenus());
-function getHoverOutlineColor(){return getTheme()==='dark'?'#ffffff':'#1f3864';}
+function getHoverOutlineColor(){return getTheme()==='dark'?'rgba(255,255,255,.55)':'rgba(31,56,100,.55)';}
 function applyPlotHoverOutline(plot,point){
   if(!plot||!point)return;const traceIndex=point.curveNumber,pointIndex=point.pointNumber,trace=plot.data?.[traceIndex];if(!trace)return;const outline=getHoverOutlineColor();
-  if(trace.type==='bar'||trace.type==='scatter'||trace.type==='scattergl'){const n=Array.isArray(trace.x)?trace.x.length:1,widths=Array(n).fill(0),cols=Array(n).fill('rgba(0,0,0,0)');widths[pointIndex]=trace.type==='bar'?3:2.5;cols[pointIndex]=outline;Plotly.restyle(plot,{'marker.line.width':[widths],'marker.line.color':[cols]},[traceIndex]);}
-  else if(trace.type==='box')Plotly.restyle(plot,{'line.width':3,'line.color':outline},[traceIndex]);
-  else if(trace.type==='pie'){const n=Array.isArray(trace.labels)?trace.labels.length:1,pulls=Array(n).fill(0);pulls[pointIndex]=.08;Plotly.restyle(plot,{pull:[pulls],'marker.line.width':2,'marker.line.color':outline},[traceIndex]);}
+  if(trace.type==='bar'||trace.type==='scatter'||trace.type==='scattergl'){const n=Array.isArray(trace.x)?trace.x.length:1,widths=Array(n).fill(0),cols=Array(n).fill('rgba(0,0,0,0)');widths[pointIndex]=trace.type==='bar'?1.5:1.25;cols[pointIndex]=outline;Plotly.restyle(plot,{'marker.line.width':[widths],'marker.line.color':[cols]},[traceIndex]);}
+  else if(trace.type==='box')Plotly.restyle(plot,{'line.width':1.5,'line.color':outline},[traceIndex]);
+  else if(trace.type==='pie'){const n=Array.isArray(trace.labels)?trace.labels.length:1,pulls=Array(n).fill(0);pulls[pointIndex]=.08;Plotly.restyle(plot,{pull:[pulls],'marker.line.width':1.25,'marker.line.color':outline},[traceIndex]);}
 }
 function clearPlotHoverOutline(plot){if(!plot||!plot.data)return;plot.data.forEach((trace,i)=>{if(trace.type==='bar'||trace.type==='scatter'||trace.type==='scattergl')Plotly.restyle(plot,{'marker.line.width':0,'marker.line.color':'rgba(0,0,0,0)'},[i]);else if(trace.type==='box')Plotly.restyle(plot,{'line.width':1},[i]);else if(trace.type==='pie')Plotly.restyle(plot,{pull:0,'marker.line.width':0},[i]);});}
 function attachHoverOutline(plotId){const plot=document.getElementById(plotId);if(!plot||!plot.on)return;plot.on('plotly_hover',e=>applyPlotHoverOutline(plot,e.points?.[0]));plot.on('plotly_unhover',()=>clearPlotHoverOutline(plot));}
